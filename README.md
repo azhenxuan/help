@@ -1,7 +1,8 @@
-# Project README
+# Project HELP
 
 A web-based Q&A platform with a focus on image-based questions.
 
+We are Team HELP, which is made up of two BZA student, Zhen Xuan and Ken.
 Our current target is Project Gemini, the intermediate level of achievement. The
 main inspiration for this project was our daily struggle with schoolwork, and 
 our inability to get timely help. By adding image support to Q&A, we hope to 
@@ -54,6 +55,8 @@ education institutes.
 *explain my line of thought more conveniently*.
 9. As an **Answer-Provider**, I want to *add a voice recording*, so I can 
 *explain my solution more clearly*.
+10. As a **User**, I want to *log in to my account*, so I can *view my previous* 
+*questions and answers*.
 
 ## Project Log
 [Link to Google Sheets](https://docs.google.com/spreadsheets/d/1irWFqA-WFoaXJmSb0RhwxuIm9TfVC-xpZLDoqmZmDJ4/edit?usp=sharing)
