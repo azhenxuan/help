@@ -2,7 +2,7 @@
 
 A web-based Q&A platform with a focus on image-based questions.
 
-We are Team HELP, which is made up of two BZA student, Zhen Xuan and Ken.
+We are Team HELP, which comprises two BZA students, Zhen Xuan and Ken.
 Our current target is Project Gemini, the intermediate level of achievement. The
 main inspiration for this project was our daily struggle with schoolwork, and 
 our inability to get timely help. By adding image support to Q&A, we hope to 
