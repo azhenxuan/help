@@ -1,6 +1,5 @@
 # Project HELP
 
-Note: NEW PLAN
 A web-based help-session scheduler.
 
 We are Team HELP, which comprises two BZA students, Zhen Xuan and Ken.
