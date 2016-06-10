@@ -73,7 +73,7 @@ def get_help():
 	return redirect(url_for('index'))
 
 @app.route('/provide_help')
-def get_help():
+def provide_help():
 	if session.get('token'):
 		user = UserAPI(session['token'])
 		name = user.get_name()
