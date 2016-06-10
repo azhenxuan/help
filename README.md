@@ -12,6 +12,10 @@ assistance, before they fall deeper into CAP hell. Upon seeing the demand for
 their services, TAs and Profs will (hopefully) start opening up time slots that
 students can ballot for.  
 
+## TODO:
+1. Add exception for invalid tokens
+2. Consultation Item Page
+
 ## Team HELP
 - Ang Zhen Xuan
 - Ken Oung Yong Quan

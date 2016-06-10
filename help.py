@@ -28,18 +28,24 @@ migrate = Migrate(app, db)
 class User(db.Model):
     __tablename__ = 'users'
     user_id = db.Column(db.String(20), primary_key=True)
-    name = db.Column(db.String(64))
+    name    = db.Column(db.String(64))
     
     def __repr__(self):
         return '<User {id}: {name}>'.format(id=self.user_id, name=self.name)
 
 class Module(db.Model):
+	__tablename__ = 'modules'
+	mod_code = db.Column(db.String(20), primary_key=True)
+	name     = db.Column(db.String(20))
+
+	def __repr__(self):
+		return '<Module {code}: {name}>'.format(code=self.mod_code, name=self.name)
 	
 ##########
 # Routes #
 ##########
 
-@app.route('/', methods=['GET', 'POST'])
+@app.route('/')
 def index():
     return render_template('index.html')
 
@@ -47,19 +53,34 @@ def index():
 def inside():
 	if request.args.get('token'):
 		session['token'] = request.args['token']
-	elif not logged_in(session.get('token')):
-		flash("You are currently logged out. Please log in.")
-		return redirect(url_for('index'))
 
-	name = get_name(session.get('token'))
-	return render_template('inside.html', name=name.title())
+	if session.get('token'):
+		user = UserAPI(session['token'])
+		name = user.get_name()
+		return render_template('inside.html', name=name.title())
+
+	flash("You are currently logged out. Please log in.")
+	return redirect(url_for('index'))
 
 @app.route('/get_help')
 def get_help():
-	if not logged_in(session.get('token')):
-		flash("You are currently logged out. Please log in.")
-		return redirect(url_for('index'))
-	return render_template('get_help.html')
+	if session.get('token'):
+		user = UserAPI(session['token'])
+		name = user.get_name()
+		return render_template('get_help.html', name=name.title())
+
+	flash("You are currently logged out. Please log in.")
+	return redirect(url_for('index'))
+
+@app.route('/provide_help')
+def get_help():
+	if session.get('token'):
+		user = UserAPI(session['token'])
+		name = user.get_name()
+		return render_template('provide_help.html', name=name.title())
+
+	flash("You are currently logged out. Please log in.")
+	return redirect(url_for('index'))
 
 
 # Error Handling
