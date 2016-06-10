@@ -1,8 +1,11 @@
 from flask import Flask, render_template, flash, request, session, redirect, url_for
 from flask_script import Manager
 from flask_bootstrap import Bootstrap
-from flask.ext.sqlalchemy import SQLAlchemy
-from flask.ext.migrate import Migrate, MigrateCommand
+from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate, MigrateCommand
+from flask_wtf import Form
+from wtforms import SubmitField, SelectField, StringField
+from wtforms_components import DateField, TimeField
 from api import *
 import requests
 import json
@@ -34,13 +37,27 @@ class User(db.Model):
         return '<User {id}: {name}>'.format(id=self.user_id, name=self.name)
 
 class Module(db.Model):
-	__tablename__ = 'modules'
-	mod_code = db.Column(db.String(20), primary_key=True)
-	name     = db.Column(db.String(20))
+    __tablename__ = 'modules'
+    mod_code = db.Column(db.String(20), primary_key=True)
+    name     = db.Column(db.String(20))
 
-	def __repr__(self):
-		return '<Module {code}: {name}>'.format(code=self.mod_code, name=self.name)
-	
+    def __repr__(self):
+        return '<Module {code}: {name}>'.format(code=self.mod_code, name=self.name)
+
+#########
+# Forms #
+#########
+
+class NewConsultForm(Form):
+    mod_code     = SelectField('Module Code', choices = [("MA1101R", "MA1101R"), 
+        ("MA1102R", "MA1102R"), ("CS1010S", "CS1010S"), ("CS2020", "CS2020")])
+    date         = DateField('Date')
+    start        = TimeField('Start')
+    end          = TimeField('End')
+    venue        = StringField('Venue')
+    max_students = SelectField('Max no. of students: ', choices = [("5", 5), ("10", 10), ("15", 15), ("20", 20)])
+    submit       = SubmitField('Create')
+
 ##########
 # Routes #
 ##########
@@ -51,36 +68,52 @@ def index():
 
 @app.route('/inside')
 def inside():
-	if request.args.get('token'):
-		session['token'] = request.args['token']
+    if request.args.get('token'):
+        session['token'] = request.args['token']
 
-	if session.get('token'):
-		user = UserAPI(session['token'])
-		name = user.get_name()
-		return render_template('inside.html', name=name.title())
+    if session.get('token'):
+        user = UserAPI(session['token'])
+        if user.logged_in():
+            name = user.get_name()
+            return render_template('inside.html', name=name.title())
 
-	flash("You are currently logged out. Please log in.")
-	return redirect(url_for('index'))
+    session['token'] = None
+    flash("You are currently logged out. Please log in.")
+    return redirect(url_for('index'))
 
 @app.route('/get_help')
 def get_help():
-	if session.get('token'):
-		user = UserAPI(session['token'])
-		name = user.get_name()
-		return render_template('get_help.html', name=name.title())
+    if session.get('token'):
+        user = UserAPI(session['token'])
+        if user.logged_in():
+            return render_template('get_help.html')
 
-	flash("You are currently logged out. Please log in.")
-	return redirect(url_for('index'))
+    session['token'] = None
+    flash("You are currently logged out. Please log in.")
+    return redirect(url_for('index'))
 
 @app.route('/provide_help')
-def get_help():
-	if session.get('token'):
-		user = UserAPI(session['token'])
-		name = user.get_name()
-		return render_template('provide_help.html', name=name.title())
+def provide_help():
+    form = NewConsultForm()
+    if session.get('token'):
+        user = UserAPI(session['token'])
+        if user.logged_in():
+            return render_template('provide_help.html', form=form)
 
-	flash("You are currently logged out. Please log in.")
-	return redirect(url_for('index'))
+    session['token'] = None
+    flash("You are currently logged out. Please log in.")
+    return redirect(url_for('index'))
+
+@app.route('/see_schedule')
+def my_schedule():
+    if session.get('token'):
+        user = UserAPI(session['token'])
+        if user.logged_in():
+            return render_template('my_schedule.html')
+
+    session['token'] = None
+    flash("You are currently logged out. Please log in.")
+    return redirect(url_for('index'))
 
 
 # Error Handling

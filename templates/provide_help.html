@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block subtitle %}Provide Help{% endblock %}
+
+{% block page_content %}
+<div class="container">
+    <div class="well">
+        <h1>HELP!</h1>
+        <p class="lead">Platform to facilitate consultations between users.</p>
+    </div>  
+
+	<!--Form-->
+    <div class="well">
+        {{ wtf.quick_form(form) }}
+    </div>
+</div>
+{% endblock %}
