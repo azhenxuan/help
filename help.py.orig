@@ -38,6 +38,31 @@ class Consultation(db.Model):
 	contact_details = db.Column(db.String(40), nullable=True)	
 	
     def __repr__(self):
+<<<<<<< HEAD
+        return '<User {id}: {name}>'.format(id=self.user_id, name=self.name)
+
+class Module(db.Model):
+    __tablename__ = 'modules'
+    mod_code = db.Column(db.String(20), primary_key=True)
+    name     = db.Column(db.String(20))
+
+    def __repr__(self):
+        return '<Module {code}: {name}>'.format(code=self.mod_code, name=self.name)
+
+#########
+# Forms #
+#########
+
+class NewConsultForm(Form):
+    mod_code     = SelectField('Module Code', choices = [("MA1101R", "MA1101R"), 
+        ("MA1102R", "MA1102R"), ("CS1010S", "CS1010S"), ("CS2020", "CS2020")])
+    date         = DateField('Date')
+    start        = TimeField('Start')
+    end          = TimeField('End')
+    venue        = StringField('Venue')
+    max_students = SelectField('Max no. of students: ', choices = [("5", 5), ("10", 10), ("15", 15), ("20", 20)])
+    submit       = SubmitField('Create')
+=======
         return '<User {id}: {name}>'.format(id=self.consult_id, name=self.module_code)
 	
 class User(db.Model):
@@ -54,20 +79,7 @@ registrations = db.Table('registrations',
 	db.Column('student_id', db.Integer, db.ForeignKey('consult_id')),
 	db.Column('class_id', db.Integer, db.ForeignKey('user_id'))
 )
-
-#########
-# Forms #
-#########
-
-class NewConsultForm(Form):
-    mod_code     = SelectField('Module Code', choices = [("MA1101R", "MA1101R"), 
-        ("MA1102R", "MA1102R"), ("CS1010S", "CS1010S"), ("CS2020", "CS2020")])
-    date         = DateField('Date')
-    start        = TimeField('Start')
-    end          = TimeField('End')
-    venue        = StringField('Venue')
-    max_students = SelectField('Max no. of students: ', choices = [("5", 5), ("10", 10), ("15", 15), ("20", 20)])
-    submit       = SubmitField('Create')
+>>>>>>> zx
 
 ##########
 # Routes #
@@ -105,6 +117,7 @@ def get_help():
 
 @app.route('/provide_help')
 def provide_help():
+<<<<<<< HEAD
     form = NewConsultForm()
     if session.get('token'):
         user = UserAPI(session['token'])
@@ -125,6 +138,15 @@ def my_schedule():
     session['token'] = None
     flash("You are currently logged out. Please log in.")
     return redirect(url_for('index'))
+=======
+	if session.get('token'):
+		user = UserAPI(session['token'])
+		name = user.get_name()
+		return render_template('provide_help.html', name=name.title())
+
+	flash("You are currently logged out. Please log in.")
+	return redirect(url_for('index'))
+>>>>>>> zx
 
 
 # Error Handling
