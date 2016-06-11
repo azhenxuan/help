@@ -28,32 +28,33 @@ migrate = Migrate(app, db)
 # Models #
 ##########
 
+registrations = db.Table('registrations',
+    db.Column('student_id', db.Integer, db.ForeignKey('consult_id')),
+    db.Column('class_id', db.Integer, db.ForeignKey('user_id'))
+)
+
 class Consultation(db.Model):
     __tablename__ = 'consultations'
     consult_id = db.Column(db.String(20), primary_key=True)
     module_code = db.Column(db.String(8))
-	date_time = db.Column(db.DateTime)
-	venue = db.Column(db.String(40))
-	num_of_students = db.Column(db.Integer)
-	contact_details = db.Column(db.String(40), nullable=True)	
-	
+    date_time = db.Column(db.DateTime)
+    venue = db.Column(db.String(40))
+    num_of_students = db.Column(db.Integer)
+    contact_details = db.Column(db.String(40), nullable=True)   
+    
     def __repr__(self):
         return '<User {id}: {name}>'.format(id=self.consult_id, name=self.module_code)
-	
+    
 class User(db.Model):
-	__tablename__ = 'users'
-	user_id = db.Column(db.String(20), primary_key=True)
-	consultations = db.relationship('Consultation', secondary=registrations,
-	backref=db.backref('users', lazy='dynamic'), lazy='dynamic')
-	
-	def __repr__(self):
-		return '<User {id}>'.format(id=self.user_id)
+    __tablename__ = 'users'
+    user_id = db.Column(db.String(20), primary_key=True)
+    consultations = db.relationship('Consultation', secondary=registrations,
+    backref=db.backref('users', lazy='dynamic'), lazy='dynamic')
+    
+    def __repr__(self):
+        return '<User {id}>'.format(id=self.user_id)
 
-	
-registrations = db.Table('registrations',
-	db.Column('student_id', db.Integer, db.ForeignKey('consult_id')),
-	db.Column('class_id', db.Integer, db.ForeignKey('user_id'))
-)
+    
 
 #########
 # Forms #
