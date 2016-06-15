@@ -28,19 +28,26 @@ migrate = Migrate(app, db)
 # Models #
 ##########
 
-registrations = db.Table('registrations',
-    db.Column('student_id', db.Integer, db.ForeignKey('consult_id')),
-    db.Column('class_id', db.Integer, db.ForeignKey('user_id'))
-)
+class Creation(db.Model):
+    _tablename_ = 'creations'
+    teacher_id = db.Column(db.String(20), db.ForeignKey('users.user_id'), primary_key=True)
+    consult_id = db.Column(db.Integer, db.ForeignKey('consultations.consult_id'), primary_key=True)
+    
+class Registration(db.Model):
+    _tablename_ = 'registrations'
+    user_id = db.Column(db.String(20), db.ForeignKey('users.user_id'), primary_key=True)
+    consult_id = db.Column(db.Integer, db.ForeignKey('consultations.consult_id'), primary_key=True)
 
 class Consultation(db.Model):
     __tablename__ = 'consultations'
-    consult_id = db.Column(db.String(20), primary_key=True)
+    consult_id = db.Column(db.Integer, primary_key=True)
     module_code = db.Column(db.String(8))
-    date_time = db.Column(db.DateTime)
+    date = db.Column(db.Date)
+    start = db.Column(db.Time)
+    end = db.Column(db.Time)
     venue = db.Column(db.String(40))
     num_of_students = db.Column(db.Integer)
-    contact_details = db.Column(db.String(40), nullable=True)   
+    contact_details = db.Column(db.String(40), nullable=True) 
     
     def __repr__(self):
         return '<User {id}: {name}>'.format(id=self.consult_id, name=self.module_code)
@@ -48,11 +55,20 @@ class Consultation(db.Model):
 class User(db.Model):
     __tablename__ = 'users'
     user_id = db.Column(db.String(20), primary_key=True)
-    consultations = db.relationship('Consultation', secondary=registrations,
-    backref=db.backref('users', lazy='dynamic'), lazy='dynamic')
+    name = db.Column(db.String(40))
+    teaching = db.relationship('Creation', 
+                               foreign_keys=[Creation.teacher_id],
+                               backref=db.backref('teacher', lazy='joined'),
+                               lazy='dynamic',
+                               cascade='all, delete-orphan')
+    attending = db.relationship('Registration', 
+                                foreign_keys=[Registration.user_id],
+                                backref=db.backref('attendees', lazy='joined'),
+                                lazy='dynamic',
+                                cascade='all, delete-orphan')
     
     def __repr__(self):
-        return '<User {id}>'.format(id=self.user_id)
+        return '<User {id}: {name}>'.format(id=self.user_id, name=self.name)
 
     
 
@@ -61,13 +77,14 @@ class User(db.Model):
 #########
 
 class NewConsultForm(Form):
-    mod_code     = SelectField('Module Code', choices = [("MA1101R", "MA1101R"), 
+    module_code     = SelectField('Module Code', choices = [("MA1101R", "MA1101R"), 
         ("MA1102R", "MA1102R"), ("CS1010S", "CS1010S"), ("CS2020", "CS2020")])
     date         = DateField('Date')
     start        = TimeField('Start')
     end          = TimeField('End')
     venue        = StringField('Venue')
-    max_students = SelectField('Max no. of students: ', choices = [("5", 5), ("10", 10), ("15", 15), ("20", 20)])
+    max_students = SelectField('Max no. of students: ', choices = [(5, "5"), (10, "10"), (15, "15"), (20, "20")], coerce=int)
+    contact_details = StringField('Handphone Number (Optional)')
     submit       = SubmitField('Create')
 
 ##########
@@ -87,6 +104,12 @@ def inside():
         user = UserAPI(session['token'])
         if user.logged_in():
             name = user.get_name()
+            user_id = user.get_user_id()
+
+            # Create user if not in db
+            if not User.query.filter_by(user_id = user_id).first():
+                new_user = User(name=name, user_id=user_id)
+                db.session.add(new_user)
             return render_template('inside.html', name=name.title())
 
     session['token'] = None
@@ -104,13 +127,25 @@ def get_help():
     flash("You are currently logged out. Please log in.")
     return redirect(url_for('index'))
 
-@app.route('/provide_help')
+@app.route('/provide_help', methods=['GET', 'POST'])
 def provide_help():
     form = NewConsultForm()
-    if session.get('token'):
-        user = UserAPI(session['token'])
-        if user.logged_in():
-            return render_template('provide_help.html', form=form)
+    user = UserAPI(session.get('token'))
+    if user.logged_in():
+        if form.validate_on_submit():
+            consult = Consultation(module_code=form.module_code.data,
+                                   date=form.date.data,
+                                   start=form.start.data,
+                                   end=form.end.data,
+                                   venue=form.venue.data,
+                                   num_of_students=form.max_students.data,
+                                   contact_details=form.contact_details.data)
+            creation = Creation(teacher_id=user.user_id, consult_id=consult.consult_id)
+            db.session.add(consult)
+            db.session.add(creation)
+
+            flash("New consultation slot added for {module_code}".format(module_code=form.module_code.data))
+        return render_template('provide_help.html', form=form)
 
     session['token'] = None
     flash("You are currently logged out. Please log in.")

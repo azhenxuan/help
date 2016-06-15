@@ -29,8 +29,6 @@ def generate_api_call(call_name, params):
 
 class UserAPI:
     def __init__(self, auth_token):
-        if not auth_token:
-            raise MissingTokenException('Missing authentication token.')
         self.api_key    = "UY5RaT4yK3lgWflM47CJo"
         self.auth_token = auth_token
         self.user_id = None
@@ -53,6 +51,9 @@ class UserAPI:
         """
         Returns true if user is logged in. False otherwise.
         """
+        if not self.api_key:
+            return False
+
         params = {'APIKey': self.api_key, 'Token': self.auth_token}
 
         logged_in_url = generate_api_call("Validate", params)
@@ -68,6 +69,9 @@ class UserAPI:
         Dictionary with the following:
         'FirstMajor', 'SecondMajor', 'UserID', 'MatriculationYear', 'Email', 'Faculty', 'Name', 'Gender'
         """
+        if not self.api_key:
+            raise MissingTokenException("User was not instantiated with a token.")
+
         params = {'APIKey': self.api_key, 'AuthToken': self.auth_token}
 
         get_profile_url = generate_api_call("Profile_View", params)
@@ -102,6 +106,9 @@ class UserAPI:
         """
         Returns information about all modules taken.
         """
+        if not self.api_key:
+            raise MissingTokenException("User was not instantiated with a token.")
+
         params = {'APIKey': self.api_key, 'AuthToken': self.auth_token}
 
         get_modules_url = generate_api_call("Modules", params)
