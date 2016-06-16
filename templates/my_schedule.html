@@ -19,98 +19,43 @@
     <!--Form-->
     <div class="container-fluid well">
         <div class="get-help col-md-6 col-sm-6 col-xs-6">
+            <h2>Get Help</h2>
 
-            <!-- For each consultation -->
+            {% for consult in get_help %}
             <div class="container-fluid well">
                 <div class="col-md-3">
-                    MA1101R
+                    {{consult.module_code}}
                 </div>
                 <div class="col-md-3">
-                    Prof. Ang
+                    {{ User.query.filter_by(user_id=consult.teacher_id).first().name.title() }}
                 </div>
                 <div class="col-md-3">
-                    9 June '16
+                    {{ consult.consult_date }}
                 </div>
                 <div class="col-md-3">
-                    COM1 DR 3
+                    {{ consult.venue }}
                 </div>
             </div>
-            <div class="container-fluid well">
-                <div class="col-md-3">
-                    MA1101R
-                </div>
-                <div class="col-md-3">
-                    Prof. Ang
-                </div>
-                <div class="col-md-3">
-                    9 June '16
-                </div>
-                <div class="col-md-3">
-                    COM1 DR 3
-                </div>
-            </div>
-            <div class="container-fluid well">
-                <div class="col-md-3">
-                    MA1101R
-                </div>
-                <div class="col-md-3">
-                    Prof. Ang
-                </div>
-                <div class="col-md-3">
-                    9 June '16
-                </div>
-                <div class="col-md-3">
-                    COM1 DR 3
-                </div>
-            </div>
-
+            {% endfor %}
         </div>
         <div class="give-help col-md-6 col-sm-6 col-xs-6">
-
-            <!-- For each consultation -->
+            <h2>Provide Help</h2>
+            {% for consult in give_help %}
             <div class="container-fluid well">
                 <div class="col-md-3">
-                    MA1101R
+                    {{consult.module_code}}
                 </div>
                 <div class="col-md-3">
-                    Prof. Ang
+                    {{ consult.attendees.all()|length }}/{{ consult.num_of_students }} Filled
                 </div>
                 <div class="col-md-3">
-                    9 June '16
+                    {{ consult.consult_date }}
                 </div>
                 <div class="col-md-3">
-                    COM1 DR 3
+                    {{ consult.venue }}
                 </div>
             </div>
-            <div class="container-fluid well">
-                <div class="col-md-3">
-                    MA1101R
-                </div>
-                <div class="col-md-3">
-                    Prof. Ang
-                </div>
-                <div class="col-md-3">
-                    9 June '16
-                </div>
-                <div class="col-md-3">
-                    COM1 DR 3
-                </div>
-            </div>
-            <div class="container-fluid well">
-                <div class="col-md-3">
-                    MA1101R
-                </div>
-                <div class="col-md-3">
-                    Prof. Ang
-                </div>
-                <div class="col-md-3">
-                    9 June '16
-                </div>
-                <div class="col-md-3">
-                    COM1 DR 3
-                </div>
-            </div>
-
+            {% endfor %}
         </div>
     </div>
 </div>

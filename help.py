@@ -23,31 +23,31 @@ manager = Manager(app)
 bootstrap = Bootstrap(app)
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
+manager.add_command('db', MigrateCommand)
 
 ##########
 # Models #
 ##########
 
-class Creation(db.Model):
-    _tablename_ = 'creations'
-    teacher_id = db.Column(db.String(20), db.ForeignKey('users.user_id'), primary_key=True)
-    consult_id = db.Column(db.Integer, db.ForeignKey('consultations.consult_id'), primary_key=True)
-    
-class Registration(db.Model):
-    _tablename_ = 'registrations'
-    user_id = db.Column(db.String(20), db.ForeignKey('users.user_id'), primary_key=True)
-    consult_id = db.Column(db.Integer, db.ForeignKey('consultations.consult_id'), primary_key=True)
+registrations = db.Table('registrations',
+    db.Column("user_id", db.String(20), db.ForeignKey('users.user_id')),
+    db.Column("consult_id", db.Integer, db.ForeignKey('consultations.consult_id')))
 
 class Consultation(db.Model):
     __tablename__ = 'consultations'
     consult_id = db.Column(db.Integer, primary_key=True)
     module_code = db.Column(db.String(8))
-    date = db.Column(db.Date)
+    consult_date = db.Column(db.Date)
     start = db.Column(db.Time)
     end = db.Column(db.Time)
     venue = db.Column(db.String(40))
     num_of_students = db.Column(db.Integer)
     contact_details = db.Column(db.String(40), nullable=True) 
+    teacher_id = db.Column(db.String(20), db.ForeignKey('users.user_id'))
+    attendees = db.relationship('User',
+                                secondary=registrations,
+                                backref=db.backref('attending', lazy='dynamic'),
+                                lazy='dynamic')
     
     def __repr__(self):
         return '<User {id}: {name}>'.format(id=self.consult_id, name=self.module_code)
@@ -56,16 +56,7 @@ class User(db.Model):
     __tablename__ = 'users'
     user_id = db.Column(db.String(20), primary_key=True)
     name = db.Column(db.String(40))
-    teaching = db.relationship('Creation', 
-                               foreign_keys=[Creation.teacher_id],
-                               backref=db.backref('teacher', lazy='joined'),
-                               lazy='dynamic',
-                               cascade='all, delete-orphan')
-    attending = db.relationship('Registration', 
-                                foreign_keys=[Registration.user_id],
-                                backref=db.backref('attendees', lazy='joined'),
-                                lazy='dynamic',
-                                cascade='all, delete-orphan')
+    teaching = db.relationship('Consultation', backref='teacher')
     
     def __repr__(self):
         return '<User {id}: {name}>'.format(id=self.user_id, name=self.name)
@@ -118,10 +109,14 @@ def inside():
 
 @app.route('/get_help')
 def get_help():
-    if session.get('token'):
-        user = UserAPI(session['token'])
-        if user.logged_in():
-            return render_template('get_help.html')
+    user = UserAPI(session.get('token'))
+    if user.logged_in():
+        # Display all consultations
+        me = User.query.filter_by(user_id=user.get_user_id()).first()
+
+        consults = Consultation.query.all()
+        consults_im_attending = me.attending.all()
+        return render_template('get_help.html', consults=consults, consults_im_attending=consults_im_attending, User=User)
 
     session['token'] = None
     flash("You are currently logged out. Please log in.")
@@ -134,15 +129,15 @@ def provide_help():
     if user.logged_in():
         if form.validate_on_submit():
             consult = Consultation(module_code=form.module_code.data,
-                                   date=form.date.data,
+                                   consult_date=form.date.data,
                                    start=form.start.data,
                                    end=form.end.data,
                                    venue=form.venue.data,
                                    num_of_students=form.max_students.data,
-                                   contact_details=form.contact_details.data)
-            creation = Creation(teacher_id=user.user_id, consult_id=consult.consult_id)
+                                   contact_details=form.contact_details.data,
+                                   teacher_id=user.get_user_id())
+
             db.session.add(consult)
-            db.session.add(creation)
 
             flash("New consultation slot added for {module_code}".format(module_code=form.module_code.data))
         return render_template('provide_help.html', form=form)
@@ -156,7 +151,26 @@ def my_schedule():
     if session.get('token'):
         user = UserAPI(session['token'])
         if user.logged_in():
-            return render_template('my_schedule.html')
+            me = User.query.filter_by(user_id=user.get_user_id()).first()
+            get_help = me.attending.all()
+            give_help = me.teaching
+            return render_template('my_schedule.html', get_help=get_help, give_help=give_help, User=User)
+
+    session['token'] = None
+    flash("You are currently logged out. Please log in.")
+    return redirect(url_for('index'))
+
+@app.route('/join_class/<consult_id>')
+def join_class(consult_id):
+    if session.get('token'):
+        user = UserAPI(session['token'])
+        if user.logged_in():
+            consult = Consultation.query.filter_by(consult_id=consult_id).first()
+            me = User.query.filter_by(user_id=user.get_user_id()).first()
+            
+            me.attending.append(consult)
+            db.session.add(me)
+            return redirect(url_for('get_help'))
 
     session['token'] = None
     flash("You are currently logged out. Please log in.")
