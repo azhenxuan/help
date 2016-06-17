@@ -84,10 +84,6 @@ class NewConsultForm(Form):
 
 @app.route('/')
 def index():
-    return render_template('index.html')
-
-@app.route('/inside')
-def inside():
     if request.args.get('token'):
         session['token'] = request.args['token']
 
@@ -101,11 +97,10 @@ def inside():
             if not User.query.filter_by(user_id = user_id).first():
                 new_user = User(name=name, user_id=user_id)
                 db.session.add(new_user)
-            return render_template('inside.html', name=name.title())
+            return render_template('index.html', name=name.title())
 
     session['token'] = None
-    flash("You are currently logged out. Please log in.")
-    return redirect(url_for('index'))
+    return render_template('index.html', name=None)
 
 @app.route('/get_help')
 def get_help():
