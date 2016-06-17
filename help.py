@@ -6,6 +6,7 @@ from flask_migrate import Migrate, MigrateCommand
 from flask_wtf import Form
 from wtforms import SubmitField, SelectField, StringField
 from wtforms_components import DateField, TimeField
+from datetime import datetime
 from api import *
 import requests
 import json
@@ -70,9 +71,9 @@ class User(db.Model):
 class NewConsultForm(Form):
     module_code     = SelectField('Module Code', choices = [("MA1101R", "MA1101R"), 
         ("MA1102R", "MA1102R"), ("CS1010S", "CS1010S"), ("CS2020", "CS2020")])
-    date         = DateField('Date')
-    start        = TimeField('Start')
-    end          = TimeField('End')
+    date         = StringField('Date', id="datepicker")
+    start        = StringField('Start', id="start")
+    end          = StringField('End', id="end")
     venue        = StringField('Venue')
     max_students = SelectField('Max no. of students: ', choices = [(5, "5"), (10, "10"), (15, "15"), (20, "20")], coerce=int)
     contact_details = StringField('Handphone Number (Optional)')
@@ -123,10 +124,12 @@ def provide_help():
     user = UserAPI(session.get('token'))
     if user.logged_in():
         if form.validate_on_submit():
+            print(type(form.start.data))
+            print(form.start.data)
             consult = Consultation(module_code=form.module_code.data,
-                                   consult_date=form.date.data,
-                                   start=form.start.data,
-                                   end=form.end.data,
+                                   consult_date=datetime.strptime(form.date.data, "%d/%m/%Y"),
+                                   start=datetime.strptime(form.start.data, "%I:%M %p").time(),
+                                   end=datetime.strptime(form.end.data, "%I:%M %p").time(),
                                    venue=form.venue.data,
                                    num_of_students=form.max_students.data,
                                    contact_details=form.contact_details.data,
