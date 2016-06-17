@@ -171,6 +171,13 @@ def join_class(consult_id):
     flash("You are currently logged out. Please log in.")
     return redirect(url_for('index'))
 
+@app.route('/logout')
+def logout():
+    session['token'] = None
+
+    flash("You have successfully logged out.")
+    return redirect(url_for('index'))
+
 
 # Error Handling
 # @app.errorhandler(404)
