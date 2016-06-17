@@ -23,17 +23,25 @@
 
             {% for consult in get_help %}
             <div class="container-fluid well">
-                <div class="col-md-3">
-                    {{consult.module_code}}
+                <div class="row">
+                    <div class="col-md-3">
+                        {{consult.module_code}}
+                    </div>
+                    <div class="col-md-3">
+                        {{ User.query.filter_by(user_id=consult.teacher_id).first().name.title() }}
+                    </div>
+                    <div class="col-md-3">
+                        {{ consult.consult_date }}
+                    </div>
+                    <div class="col-md-3">
+                        {{ consult.venue }}
+                    </div>
                 </div>
-                <div class="col-md-3">
-                    {{ User.query.filter_by(user_id=consult.teacher_id).first().name.title() }}
-                </div>
-                <div class="col-md-3">
-                    {{ consult.consult_date }}
-                </div>
-                <div class="col-md-3">
-                    {{ consult.venue }}
+                <br>
+                <div class="row">
+                    <a href="quit_class/{{consult.consult_id}}" class="btn btn-block btn-default" aria-label="Quit">
+                      <strong>Quit</strong>
+                    </a>
                 </div>
             </div>
             {% endfor %}

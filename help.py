@@ -142,14 +142,14 @@ def provide_help():
     return redirect(url_for('index'))
 
 @app.route('/see_schedule')
-def my_schedule():
+def see_schedule():
     if session.get('token'):
         user = UserAPI(session['token'])
         if user.logged_in():
             me = User.query.filter_by(user_id=user.get_user_id()).first()
             get_help = me.attending.all()
             give_help = me.teaching
-            return render_template('my_schedule.html', get_help=get_help, give_help=give_help, User=User)
+            return render_template('see_schedule.html', get_help=get_help, give_help=give_help, User=User)
 
     session['token'] = None
     flash("You are currently logged out. Please log in.")
@@ -166,6 +166,22 @@ def join_class(consult_id):
             me.attending.append(consult)
             db.session.add(me)
             return redirect(url_for('get_help'))
+
+    session['token'] = None
+    flash("You are currently logged out. Please log in.")
+    return redirect(url_for('index'))
+
+@app.route('/quit_class/<consult_id>')
+def quit_class(consult_id):
+    if session.get('token'):
+        user = UserAPI(session['token'])
+        if user.logged_in():
+            consult = Consultation.query.filter_by(consult_id=consult_id).first()
+            me = User.query.filter_by(user_id=user.get_user_id()).first()
+            
+            me.attending.remove(consult)
+            db.session.add(me)
+            return redirect(url_for('see_schedule'))
 
     session['token'] = None
     flash("You are currently logged out. Please log in.")
