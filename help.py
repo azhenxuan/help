@@ -112,7 +112,9 @@ def get_help():
 
         consults = Consultation.query.all()
         consults_im_attending = me.attending.all()
-        return render_template('get_help.html', consults=consults, consults_im_attending=consults_im_attending, User=User)
+        consults_im_teaching = me.teaching
+        consults_im_not_teaching = [consult for consult in consults if consult not in consults_im_teaching]
+        return render_template('get_help.html', consults=consults_im_not_teaching, consults_im_attending=consults_im_attending, User=User)
 
     session['token'] = None
     flash("You are currently logged out. Please log in.")
@@ -124,8 +126,6 @@ def provide_help():
     user = UserAPI(session.get('token'))
     if user.logged_in():
         if form.validate_on_submit():
-            print(type(form.start.data))
-            print(form.start.data)
             consult = Consultation(module_code=form.module_code.data,
                                    consult_date=datetime.strptime(form.date.data, "%d/%m/%Y"),
                                    start=datetime.strptime(form.start.data, "%I:%M %p").time(),
@@ -181,10 +181,36 @@ def quit_class(consult_id):
         if user.logged_in():
             consult = Consultation.query.filter_by(consult_id=consult_id).first()
             me = User.query.filter_by(user_id=user.get_user_id()).first()
-            
+
             me.attending.remove(consult)
             db.session.add(me)
             return redirect(url_for('see_schedule'))
+
+    session['token'] = None
+    flash("You are currently logged out. Please log in.")
+    return redirect(url_for('index'))
+
+@app.route('/update_class/<consult_id>')
+def update_class(consult_id):
+    if session.get('token'):
+        user = UserAPI(session['token'])
+        if user.logged_in():
+            consult = Consultation.query.filter_by(consult_id=consult_id).first()
+            me = User.query.filter_by(user_id=user.get_user_id()).first()
+            
+            form = NewConsultForm(module_code=consult.module_code,
+                                  date = datetime.strftime(consult.consult_date, "%d/%m/%Y"),
+                                  start = consult.start.strftime("%I:%M %p"),
+                                  end = consult.end.strftime("%I:%M %p"),
+                                  venue = consult.venue,
+                                  max_students = consult.num_of_students,
+                                  contact_details =  consult.contact_details)
+
+            if consult not in me.teaching:
+                flash("You are not teaching this class.")
+                return redirect(url_for('index'))
+            flash("You are editing a consultation slot.")
+            return render_template("provide_help.html", form=form)
 
     session['token'] = None
     flash("You are currently logged out. Please log in.")

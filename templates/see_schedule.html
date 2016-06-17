@@ -50,17 +50,24 @@
             <h2>Provide Help</h2>
             {% for consult in give_help %}
             <div class="container-fluid well">
-                <div class="col-md-3">
-                    {{consult.module_code}}
+                <div class="row">
+                    <div class="col-md-3">
+                        {{consult.module_code}}
+                    </div>
+                    <div class="col-md-3">
+                        {{ consult.attendees.all()|length }}/{{ consult.num_of_students }} Filled
+                    </div>
+                    <div class="col-md-3">
+                        {{ consult.consult_date }}
+                    </div>
+                    <div class="col-md-3">
+                        {{ consult.venue }}
+                    </div>
                 </div>
-                <div class="col-md-3">
-                    {{ consult.attendees.all()|length }}/{{ consult.num_of_students }} Filled
-                </div>
-                <div class="col-md-3">
-                    {{ consult.consult_date }}
-                </div>
-                <div class="col-md-3">
-                    {{ consult.venue }}
+                <div class="row">
+                    <a href="update_class?={{consult.consult_id}}" class="btn btn-block btn-default" aria-label="Update">
+                      <strong>Update</strong>
+                    </a>
                 </div>
             </div>
             {% endfor %}
