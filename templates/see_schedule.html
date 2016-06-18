@@ -64,10 +64,18 @@
                         {{ consult.venue }}
                     </div>
                 </div>
+                <br>
                 <div class="row">
-                    <a href="update_class?={{consult.consult_id}}" class="btn btn-block btn-default" aria-label="Update">
-                      <strong>Update</strong>
-                    </a>
+                    <div class="col-md-6">
+                        <a href="update_class/{{consult.consult_id}}" class="btn btn-block btn-default" aria-label="Update">
+                          <strong>Update</strong>
+                        </a>
+                    </div>
+                    <div class="col-md-6">
+                        <a href="delete_class/{{consult.consult_id}}" class="btn btn-block btn-default" aria-label="Update">
+                          <strong>Delete</strong>
+                        </a>
+                    </div>
                 </div>
             </div>
             {% endfor %}

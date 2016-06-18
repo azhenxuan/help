@@ -26,6 +26,7 @@ db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 manager.add_command('db', MigrateCommand)
 
+
 ##########
 # Models #
 ##########
@@ -77,7 +78,7 @@ class NewConsultForm(Form):
     venue        = StringField('Venue')
     max_students = SelectField('Max no. of students: ', choices = [(5, "5"), (10, "10"), (15, "15"), (20, "20")], coerce=int)
     contact_details = StringField('Handphone Number (Optional)')
-    submit       = SubmitField('Create')
+    submit       = SubmitField()
 
 ##########
 # Routes #
@@ -122,22 +123,48 @@ def get_help():
 
 @app.route('/provide_help', methods=['GET', 'POST'])
 def provide_help():
-    form = NewConsultForm()
+    if session.get("consult_id"):
+        consult_id = session["consult_id"]
+        consult = Consultation.query.filter_by(consult_id=consult_id).first()        
+        form = NewConsultForm(module_code=consult.module_code,
+                              date = datetime.strftime(consult.consult_date, "%d/%m/%Y"),
+                              start = consult.start.strftime("%I:%M %p"),
+                              end = consult.end.strftime("%I:%M %p"),
+                              venue = consult.venue,
+                              max_students = consult.num_of_students,
+                              contact_details = consult.contact_details)
+    else:
+        form = NewConsultForm()
+
     user = UserAPI(session.get('token'))
     if user.logged_in():
         if form.validate_on_submit():
-            consult = Consultation(module_code=form.module_code.data,
-                                   consult_date=datetime.strptime(form.date.data, "%d/%m/%Y"),
-                                   start=datetime.strptime(form.start.data, "%I:%M %p").time(),
-                                   end=datetime.strptime(form.end.data, "%I:%M %p").time(),
-                                   venue=form.venue.data,
-                                   num_of_students=form.max_students.data,
-                                   contact_details=form.contact_details.data,
-                                   teacher_id=user.get_user_id())
+            if session.get("consult_id"):
+                session["consult_id"] = None
+                # Update consult
+                consult.module_code=form.module_code.data
+                consult.consult_date=datetime.strptime(form.date.data, "%d/%m/%Y")
+                consult.start=datetime.strptime(form.start.data, "%I:%M %p").time()
+                consult.end=datetime.strptime(form.end.data, "%I:%M %p").time()
+                consult.venue=form.venue.data
+                consult.num_of_students=form.max_students.data
+                consult.contact_details=form.contact_details.data
+                flash("Consultation slot for {module_code} has been updated".format(module_code=form.module_code.data))
+                
+            else:
+                consult = Consultation(module_code=form.module_code.data,
+                                       consult_date=datetime.strptime(form.date.data, "%d/%m/%Y"),
+                                       start=datetime.strptime(form.start.data, "%I:%M %p").time(),
+                                       end=datetime.strptime(form.end.data, "%I:%M %p").time(),
+                                       venue=form.venue.data,
+                                       num_of_students=form.max_students.data,
+                                       contact_details=form.contact_details.data,
+                                       teacher_id=user.get_user_id())
+                flash("New consultation slot added for {module_code}".format(module_code=form.module_code.data))
 
             db.session.add(consult)
-
-            flash("New consultation slot added for {module_code}".format(module_code=form.module_code.data))
+            return redirect(url_for('see_schedule'))
+            
         return render_template('provide_help.html', form=form)
 
     session['token'] = None
@@ -197,20 +224,34 @@ def update_class(consult_id):
         if user.logged_in():
             consult = Consultation.query.filter_by(consult_id=consult_id).first()
             me = User.query.filter_by(user_id=user.get_user_id()).first()
-            
-            form = NewConsultForm(module_code=consult.module_code,
-                                  date = datetime.strftime(consult.consult_date, "%d/%m/%Y"),
-                                  start = consult.start.strftime("%I:%M %p"),
-                                  end = consult.end.strftime("%I:%M %p"),
-                                  venue = consult.venue,
-                                  max_students = consult.num_of_students,
-                                  contact_details =  consult.contact_details)
 
             if consult not in me.teaching:
                 flash("You are not teaching this class.")
                 return redirect(url_for('index'))
+
             flash("You are editing a consultation slot.")
-            return render_template("provide_help.html", form=form)
+            session["consult_id"] = consult_id
+            return redirect(url_for('provide_help'))
+
+    session['token'] = None
+    flash("You are currently logged out. Please log in.")
+    return redirect(url_for('index'))
+
+@app.route('/delete_class/<consult_id>')
+def delete_class(consult_id):
+    if session.get('token'):
+        user = UserAPI(session['token'])
+        if user.logged_in():
+            consult = Consultation.query.filter_by(consult_id=consult_id).first()
+            me = User.query.filter_by(user_id=user.get_user_id()).first()
+            
+            if consult not in me.teaching:
+                flash("You are not teaching this class.")
+                return redirect(url_for('index'))
+
+            db.session.delete(consult)
+            flash("You have deleted a consultation slot.")
+            return redirect(url_for('see_schedule'))
 
     session['token'] = None
     flash("You are currently logged out. Please log in.")
@@ -223,15 +264,14 @@ def logout():
     flash("You have successfully logged out.")
     return redirect(url_for('index'))
 
-
 # Error Handling
-# @app.errorhandler(404)
-# def page_not_found(e):
-#   return render_template('404.html'), 404
+@app.errorhandler(404)
+def page_not_found(e):
+  return render_template('404.html'), 404
 
-# @app.errorhandler(500)
-# def internal_server_error(e):
-#   return render_template('500.html'), 500
+@app.errorhandler(500)
+def internal_server_error(e):
+  return render_template('500.html'), 500
 
 if __name__ == '__main__':
     manager.run()
