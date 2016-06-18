@@ -19,7 +19,7 @@
 				<div class="consult-info">
 					<p>{{ consult.consult_date }}</p>
 					<p>{{ consult.venue }}</p>
-					<p>{{ User.query.filter_by(user_id=consult.teacher_id).first().name.title() }}</p>
+					<p>{{ User.query.get(consult.teacher_id).name.title() }}</p>
 					<p>{{ consult.attendees.all()|length }}/{{ consult.num_of_students }} Slots Filled</p>
 				</div>
     		</div>

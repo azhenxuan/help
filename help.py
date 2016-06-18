@@ -4,6 +4,7 @@ from flask_bootstrap import Bootstrap
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate, MigrateCommand
 from flask_wtf import Form
+from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 from wtforms import SubmitField, SelectField, StringField
 from wtforms_components import DateField, TimeField
 from datetime import datetime
@@ -24,8 +25,17 @@ manager = Manager(app)
 bootstrap = Bootstrap(app)
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
+login_manager = LoginManager(app)
 manager.add_command('db', MigrateCommand)
 
+#########
+# Login #
+#########
+login_manager.session_protection = "strong"
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(user_id.decode('utf-8'))
 
 ##########
 # Models #
@@ -54,7 +64,7 @@ class Consultation(db.Model):
     def __repr__(self):
         return '<User {id}: {name}>'.format(id=self.consult_id, name=self.module_code)
     
-class User(db.Model):
+class User(UserMixin, db.Model):
     __tablename__ = 'users'
     user_id = db.Column(db.String(20), primary_key=True)
     name = db.Column(db.String(40))
@@ -63,7 +73,21 @@ class User(db.Model):
     def __repr__(self):
         return '<User {id}: {name}>'.format(id=self.user_id, name=self.name)
 
-    
+    def is_authenticated(self):
+        return True
+        if session.get('token'):
+            user = UserAPI(session['token'])
+            return user.logged_in()
+        return False
+
+    def is_active(self):
+        return self.is_authenticated()
+
+    def is_anonymous(self):
+        return False
+
+    def get_id(self):
+        return self.user_id.encode('utf-8')    
 
 #########
 # Forms #
@@ -94,177 +118,137 @@ def index():
         if user.logged_in():
             name = user.get_name()
             user_id = user.get_user_id()
+            db_user = User.query.get(user_id)
 
             # Create user if not in db
-            if not User.query.filter_by(user_id = user_id).first():
-                new_user = User(name=name, user_id=user_id)
-                db.session.add(new_user)
+            if not db_user:
+                db_user = User(name=name, user_id=user_id)
+                db.session.add(db_user)
+
+            login_user(db_user)
+
             return render_template('index.html', name=name.title())
 
     session['token'] = None
     return render_template('index.html', name=None)
 
 @app.route('/get_help')
+@login_required
 def get_help():
-    user = UserAPI(session.get('token'))
-    if user.logged_in():
-        # Display all consultations
-        me = User.query.filter_by(user_id=user.get_user_id()).first()
-
-        consults = Consultation.query.all()
-        consults_im_attending = me.attending.all()
-        consults_im_teaching = me.teaching
-        consults_im_not_teaching = [consult for consult in consults if consult not in consults_im_teaching]
-        return render_template('get_help.html', consults=consults_im_not_teaching, consults_im_attending=consults_im_attending, User=User)
-
-    session['token'] = None
-    flash("You are currently logged out. Please log in.")
-    return redirect(url_for('index'))
+    consults = Consultation.query.all()
+    consults_im_attending = current_user.attending.all()
+    consults_im_teaching = current_user.teaching
+    consults_im_not_teaching = [consult for consult in consults if consult not in consults_im_teaching]
+    return render_template('get_help.html', consults=consults_im_not_teaching, consults_im_attending=consults_im_attending, User=User)
 
 @app.route('/provide_help', methods=['GET', 'POST'])
+@login_required
 def provide_help():
-    if session.get("consult_id"):
-        consult_id = session["consult_id"]
-        consult = Consultation.query.filter_by(consult_id=consult_id).first()        
-        form = NewConsultForm(module_code=consult.module_code,
-                              date = datetime.strftime(consult.consult_date, "%d/%m/%Y"),
-                              start = consult.start.strftime("%I:%M %p"),
-                              end = consult.end.strftime("%I:%M %p"),
-                              venue = consult.venue,
-                              max_students = consult.num_of_students,
-                              contact_details = consult.contact_details)
-    else:
-        form = NewConsultForm()
+    form = NewConsultForm()
 
-    user = UserAPI(session.get('token'))
-    if user.logged_in():
-        if form.validate_on_submit():
-            if session.get("consult_id"):
-                session["consult_id"] = None
-                # Update consult
-                consult.module_code=form.module_code.data
-                consult.consult_date=datetime.strptime(form.date.data, "%d/%m/%Y")
-                consult.start=datetime.strptime(form.start.data, "%I:%M %p").time()
-                consult.end=datetime.strptime(form.end.data, "%I:%M %p").time()
-                consult.venue=form.venue.data
-                consult.num_of_students=form.max_students.data
-                consult.contact_details=form.contact_details.data
-                flash("Consultation slot for {module_code} has been updated".format(module_code=form.module_code.data))
-                
-            else:
-                consult = Consultation(module_code=form.module_code.data,
-                                       consult_date=datetime.strptime(form.date.data, "%d/%m/%Y"),
-                                       start=datetime.strptime(form.start.data, "%I:%M %p").time(),
-                                       end=datetime.strptime(form.end.data, "%I:%M %p").time(),
-                                       venue=form.venue.data,
-                                       num_of_students=form.max_students.data,
-                                       contact_details=form.contact_details.data,
-                                       teacher_id=user.get_user_id())
-                flash("New consultation slot added for {module_code}".format(module_code=form.module_code.data))
+    if form.validate_on_submit():
+        consult = Consultation(module_code=form.module_code.data,
+                               consult_date=datetime.strptime(form.date.data, "%d/%m/%Y"),
+                               start=datetime.strptime(form.start.data, "%I:%M %p").time(),
+                               end=datetime.strptime(form.end.data, "%I:%M %p").time(),
+                               venue=form.venue.data,
+                               num_of_students=form.max_students.data,
+                               contact_details=form.contact_details.data,
+                               teacher_id=current_user.user_id)
+        flash("New consultation slot added for {module_code}".format(module_code=form.module_code.data))
+        db.session.add(consult)
+        return redirect(url_for('see_schedule'))
 
-            db.session.add(consult)
-            return redirect(url_for('see_schedule'))
-            
-        return render_template('provide_help.html', form=form)
-
-    session['token'] = None
-    flash("You are currently logged out. Please log in.")
-    return redirect(url_for('index'))
+    return render_template('provide_help.html', form=form)
 
 @app.route('/see_schedule')
+@login_required
 def see_schedule():
-    if session.get('token'):
-        user = UserAPI(session['token'])
-        if user.logged_in():
-            me = User.query.filter_by(user_id=user.get_user_id()).first()
-            get_help = me.attending.all()
-            give_help = me.teaching
-            return render_template('see_schedule.html', get_help=get_help, give_help=give_help, User=User)
-
-    session['token'] = None
-    flash("You are currently logged out. Please log in.")
-    return redirect(url_for('index'))
+    get_help = current_user.attending.all()
+    give_help = current_user.teaching
+    return render_template('see_schedule.html', get_help=get_help, give_help=give_help, User=User)
 
 @app.route('/join_class/<consult_id>')
+@login_required
 def join_class(consult_id):
-    if session.get('token'):
-        user = UserAPI(session['token'])
-        if user.logged_in():
-            consult = Consultation.query.filter_by(consult_id=consult_id).first()
-            me = User.query.filter_by(user_id=user.get_user_id()).first()
-            
-            me.attending.append(consult)
-            db.session.add(me)
-            return redirect(url_for('get_help'))
-
-    session['token'] = None
-    flash("You are currently logged out. Please log in.")
-    return redirect(url_for('index'))
+    consult = Consultation.query.get(consult_id)
+    if consult not in current_user.attending:
+        current_user.attending.append(consult)
+    db.session.add(current_user)
+    return redirect(url_for('get_help'))
 
 @app.route('/quit_class/<consult_id>')
+@login_required
 def quit_class(consult_id):
-    if session.get('token'):
-        user = UserAPI(session['token'])
-        if user.logged_in():
-            consult = Consultation.query.filter_by(consult_id=consult_id).first()
-            me = User.query.filter_by(user_id=user.get_user_id()).first()
+    consult = Consultation.query.get(consult_id)
+    if consult in current_user.attending:
+        current_user.attending.remove(consult)
+    db.session.add(current_user)
+    return redirect(url_for('see_schedule'))
 
-            me.attending.remove(consult)
-            db.session.add(me)
-            return redirect(url_for('see_schedule'))
+@app.route('/update_class', methods=['GET', 'POST'])
+@login_required
+def update_class():
+    consult = Consultation.query.get(request.args.get('consult_id'))
+    
+    if consult not in current_user.teaching:
+        flash("You are not teaching this class.")
+        return redirect(url_for('see_schedule'))
 
-    session['token'] = None
-    flash("You are currently logged out. Please log in.")
-    return redirect(url_for('index'))
+    form = NewConsultForm(module_code=consult.module_code,
+                          date = datetime.strftime(consult.consult_date, "%d/%m/%Y"),
+                          start = consult.start.strftime("%I:%M %p"),
+                          end = consult.end.strftime("%I:%M %p"),
+                          venue = consult.venue,
+                          max_students = consult.num_of_students,
+                          contact_details = consult.contact_details)
 
-@app.route('/update_class/<consult_id>')
-def update_class(consult_id):
-    if session.get('token'):
-        user = UserAPI(session['token'])
-        if user.logged_in():
-            consult = Consultation.query.filter_by(consult_id=consult_id).first()
-            me = User.query.filter_by(user_id=user.get_user_id()).first()
+    if form.validate_on_submit():
+        consult.module_code=form.module_code.data
+        consult.consult_date=datetime.strptime(form.date.data, "%d/%m/%Y")
+        consult.start=datetime.strptime(form.start.data, "%I:%M %p").time()
+        consult.end=datetime.strptime(form.end.data, "%I:%M %p").time()
+        consult.venue=form.venue.data
+        consult.num_of_students=form.max_students.data
+        consult.contact_details=form.contact_details.data
+        consult.teacher_id=current_user.user_id
 
-            if consult not in me.teaching:
-                flash("You are not teaching this class.")
-                return redirect(url_for('index'))
+        db.session.add(consult)
 
-            flash("You are editing a consultation slot.")
-            session["consult_id"] = consult_id
-            return redirect(url_for('provide_help'))
+        flash("You have updated your consultation slot for {module_code}".format(module_code=consult.module_code))
+        return redirect(url_for('see_schedule'))
 
-    session['token'] = None
-    flash("You are currently logged out. Please log in.")
-    return redirect(url_for('index'))
+    flash("You are editing a consultation slot.")   
+    return render_template('provide_help.html', form=form)
 
 @app.route('/delete_class/<consult_id>')
+@login_required
 def delete_class(consult_id):
-    if session.get('token'):
-        user = UserAPI(session['token'])
-        if user.logged_in():
-            consult = Consultation.query.filter_by(consult_id=consult_id).first()
-            me = User.query.filter_by(user_id=user.get_user_id()).first()
-            
-            if consult not in me.teaching:
-                flash("You are not teaching this class.")
-                return redirect(url_for('index'))
+    consult = Consultation.query.get(consult_id)
+    
+    if consult not in current_user.teaching:
+        flash("You are not teaching this class.")
+        return redirect(url_for('see_schedule'))
 
-            db.session.delete(consult)
-            flash("You have deleted a consultation slot.")
-            return redirect(url_for('see_schedule'))
+    db.session.delete(consult)
+    flash("You have deleted a consultation slot.")
+    return redirect(url_for('see_schedule'))
 
-    session['token'] = None
-    flash("You are currently logged out. Please log in.")
-    return redirect(url_for('index'))
-
-@app.route('/logout')
+@app.route("/logout")
+@login_required
 def logout():
+    logout_user()
     session['token'] = None
 
     flash("You have successfully logged out.")
     return redirect(url_for('index'))
 
 # Error Handling
+@app.errorhandler(401)
+def logged_out(e):
+    flash("You are currently logged out. Please log in.")
+    return redirect(url_for('index'))
+
 @app.errorhandler(404)
 def page_not_found(e):
   return render_template('404.html'), 404
