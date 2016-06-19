@@ -31,7 +31,9 @@
                         {{ User.query.filter_by(user_id=consult.teacher_id).first().name.title() }}
                     </div>
                     <div class="col-md-3">
-                        {{ consult.consult_date }}
+                        {{ consult.consult_date }}<br>
+                        {{ consult.start.strftime("%I:%M %p") }} - 
+                        {{ consult.end.strftime("%I:%M %p") }}
                     </div>
                     <div class="col-md-3">
                         {{ consult.venue }}
@@ -58,7 +60,9 @@
                         {{ consult.attendees.all()|length }}/{{ consult.num_of_students }} Filled
                     </div>
                     <div class="col-md-3">
-                        {{ consult.consult_date }}
+                        {{ consult.consult_date }}<br>
+                        {{ consult.start.strftime("%I:%M %p") }} - 
+                        {{ consult.end.strftime("%I:%M %p") }}
                     </div>
                     <div class="col-md-3">
                         {{ consult.venue }}
