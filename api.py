@@ -1,5 +1,5 @@
 import urllib.parse
-import requests 
+import requests
 
 # Global Variables
 test_token = "D2F2394018F3DE779A340B93DBBE60BBAA0CC5F01269BFB7BC44234CC42443C6E4608E03C0C885D17BDB9A310DB65E5026BCBAC7590AAEAFF7FA821DB287D2898404FC6A926F4E510E2AA8436248177B85C8286CDCD6A683C36D994FA449A5F1E915599CC6E65155B33EBF61DB86A3DFC392FCDBD8159EF8241A4CF7526F0DED49E77651A6036A90EB13D2C060E8FD2D8D3DF7A7735391C4B6662F1FED019FC7C1B9F85435935FD8FE017E2C94749042346AE0DBE2FAFA10D124990C67D2A5C0BBD98D1E91E7C41D1D9E9F126A26F63EE4886CEC7A27CEA43ECDAE1C0FC578AAF626F9370A81D791CA8A04F66D91CE5A"
@@ -114,6 +114,32 @@ class UserAPI:
         get_modules_url = generate_api_call("Modules", params)
         r = requests.get(get_modules_url)
         return r.json()['Results']
+
+    def get_modules_names(self):
+        """
+        Returns a list of the names of all modules the student has taken.
+        """
+        return [mod['CourseCode'] for mod in self.get_modules()]
+
+    def get_modules_taken(self):
+        """
+        Returns a list of all modules the student has taken.
+        """
+        if not self.api_key:
+            raise MissingTokenException("User was not instantiated with a token.")
+
+        params = {'APIKey': self.api_key, 'AuthToken': self.auth_token, 'StudentID': self.get_user_id()}
+
+        get_modules_url = generate_api_call("Modules_Taken", params)
+        r = requests.get(get_modules_url)
+        return r.json()['Results']
+
+    def get_modules_taken_names(self):
+        """
+        Returns a list of the names of all modules the student has taken.
+        """
+        modules_taken = self.get_modules_taken()
+        return [mod['ModuleCode'] for mod in modules_taken]
 
     if __name__ == '__main__':
         pass

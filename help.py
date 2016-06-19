@@ -62,7 +62,10 @@ class Consultation(db.Model):
                                 lazy='dynamic')
     
     def __repr__(self):
-        return '<User {id}: {name}>'.format(id=self.consult_id, name=self.module_code)
+        return '<Consult {id}: {name}>'.format(id=self.consult_id, name=self.module_code)
+
+    def not_full(self):
+        return (len(self.attendees.all()) < self.num_of_students)
     
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
@@ -94,13 +97,12 @@ class User(UserMixin, db.Model):
 #########
 
 class NewConsultForm(Form):
-    module_code     = SelectField('Module Code', choices = [("MA1101R", "MA1101R"), 
-        ("MA1102R", "MA1102R"), ("CS1010S", "CS1010S"), ("CS2020", "CS2020")])
+    module_code  = SelectField('Module Code', choices = [])
     date         = StringField('Date', id="datepicker")
     start        = StringField('Start', id="start")
     end          = StringField('End', id="end")
     venue        = StringField('Venue')
-    max_students = SelectField('Max no. of students: ', choices = [(5, "5"), (10, "10"), (15, "15"), (20, "20")], coerce=int)
+    max_students = SelectField('Max no. of students: ', choices = [(1, "1"), (5, "5"), (10, "10"), (15, "15"), (20, "20")], coerce=int)
     contact_details = StringField('Handphone Number (Optional)')
     submit       = SubmitField()
 
@@ -138,13 +140,17 @@ def get_help():
     consults = Consultation.query.all()
     consults_im_attending = current_user.attending.all()
     consults_im_teaching = current_user.teaching
-    consults_im_not_teaching = [consult for consult in consults if consult not in consults_im_teaching]
-    return render_template('get_help.html', consults=consults_im_not_teaching, consults_im_attending=consults_im_attending, User=User)
+    modules_im_taking = UserAPI(session['token']).get_modules_names()
+    consults_to_display = [consult for consult in consults if consult not in consults_im_teaching and consult.not_full() and (consult.module_code in modules_im_taking)]
+    return render_template('get_help.html', consults=consults_to_display, consults_im_attending=consults_im_attending, User=User)
 
 @app.route('/provide_help', methods=['GET', 'POST'])
 @login_required
 def provide_help():
     form = NewConsultForm()
+    mods = UserAPI(session['token']).get_modules_taken_names()
+    mod_choices = [(mod, mod) for mod in mods]
+    form.module_code.choices = mod_choices
 
     if form.validate_on_submit():
         consult = Consultation(module_code=form.module_code.data,
@@ -172,9 +178,14 @@ def see_schedule():
 @login_required
 def join_class(consult_id):
     consult = Consultation.query.get(consult_id)
-    if consult not in current_user.attending:
+    if consult not in current_user.attending and consult.not_full():
         current_user.attending.append(consult)
-    db.session.add(current_user)
+        db.session.add(current_user)
+        flash("You have successfully enrolled in this class.")
+    elif not consult.not_full():
+        flash("You're too late! There are no more slots left for this consult.")
+    else:
+        flash("You've already enrolled in this class.")
     return redirect(url_for('get_help'))
 
 @app.route('/quit_class/<consult_id>')
@@ -202,6 +213,10 @@ def update_class():
                           venue = consult.venue,
                           max_students = consult.num_of_students,
                           contact_details = consult.contact_details)
+
+    mods = UserAPI(session['token']).get_modules_taken_names()
+    mod_choices = [(mod, mod) for mod in mods]
+    form.module_code.choices = mod_choices
 
     if form.validate_on_submit():
         consult.module_code=form.module_code.data
