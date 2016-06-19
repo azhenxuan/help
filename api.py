@@ -115,11 +115,11 @@ class UserAPI:
         r = requests.get(get_modules_url)
         return r.json()['Results']
 
-    def get_modules_names(self):
+    def get_modules_code_names(self):
         """
         Returns a list of the names of all modules the student has taken.
         """
-        return [mod['CourseCode'] for mod in self.get_modules()]
+        return [(mod['CourseName'], mod['CourseCode']) for mod in self.get_modules()]
 
     def get_modules_taken(self):
         """
@@ -134,7 +134,7 @@ class UserAPI:
         r = requests.get(get_modules_url)
         return r.json()['Results']
 
-    def get_modules_taken_names(self):
+    def get_modules_taken_code_names(self):
         """
         Returns a list of the names of all modules the student has taken.
         """

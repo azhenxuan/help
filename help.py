@@ -46,10 +46,16 @@ registrations = db.Table('registrations',
     db.Column("user_id", db.String(20), db.ForeignKey('users.user_id')),
     db.Column("consult_id", db.Integer, db.ForeignKey('consultations.consult_id')))
 
+class UserModule(db.Model):
+    __tablename__ = 'usermodules'
+    user_id = db.Column(db.String(20), db.ForeignKey('users.user_id'), primary_key=True)
+    module_id = db.Column(db.String(40), db.ForeignKey('modules.module_code'), primary_key=True)
+    currently_taking = db.Column(db.Boolean)
+
 class Consultation(db.Model):
     __tablename__ = 'consultations'
     consult_id = db.Column(db.Integer, primary_key=True)
-    module_code = db.Column(db.String(8))
+    module_code = db.Column(db.String(40), db.ForeignKey('modules.module_code'))
     consult_date = db.Column(db.Date)
     start = db.Column(db.Time)
     end = db.Column(db.Time)
@@ -73,6 +79,11 @@ class User(UserMixin, db.Model):
     user_id = db.Column(db.String(20), primary_key=True)
     name = db.Column(db.String(40))
     teaching = db.relationship('Consultation', backref='teacher')
+    modules = db.relationship('UserModule',
+                              foreign_keys=[UserModule.user_id],
+                              backref=db.backref('user', lazy='joined'),
+                              lazy='dynamic',
+                              cascade='all, delete-orphan')
     
     def __repr__(self):
         return '<User {id}: {name}>'.format(id=self.user_id, name=self.name)
@@ -91,7 +102,38 @@ class User(UserMixin, db.Model):
         return False
 
     def get_id(self):
-        return self.user_id.encode('utf-8')    
+        return self.user_id.encode('utf-8')
+
+    def takes(self, module, current):
+        t = UserModule(user=self, module=module, currently_taking=current)
+        db.session.add(t)
+
+    @property
+    def modules_taken(self):
+        return Module.query.join(UserModule, UserModule.module_id == Module.module_code).filter(UserModule.user_id == self.user_id)
+
+    @property
+    def current_mods(self):
+        return Module.query.join(UserModule, UserModule.module_id == Module.module_code).filter(UserModule.user_id == self.user_id and Module.currently_taking==True)
+
+class Module(db.Model):
+    __tablename__ = 'modules'
+    module_code = db.Column(db.String(40), primary_key=True)
+    name = db.Column(db.String(60))
+    consults = db.relationship('Consultation', backref='module')
+    modules = db.relationship('UserModule',
+                              foreign_keys=[UserModule.module_id],
+                              backref=db.backref('module', lazy='joined'),
+                              lazy='dynamic',
+                              cascade='all, delete-orphan')
+
+    @property
+    def users_read(self):
+        return User.query.join(UserModule, UserModule.user_id == User.user_id).filter(UserModule.module_id == self.module_code)
+
+
+    def __repr__(self):
+        return '<Module {module_code}: {name}>'.format(module_code=self.module_code, name=self.name) 
 
 #########
 # Forms #
@@ -126,8 +168,38 @@ def index():
             # Create user if not in db
             if not db_user:
                 db_user = User(name=name, user_id=user_id)
-                db.session.add(db_user)
 
+            # Clear all modules
+            for mod in db_user.modules.all():
+                db_user.modules.remove(mod)
+
+            # Get your modules
+            modules_taken = user.get_modules_taken()
+            for module in modules_taken:
+                module_name = module['ModuleTitle']
+                module_code = module['ModuleCode']
+
+                current_year = datetime.now().year
+                mod_year = int(module['AcadYear'].split('/')[1])
+                if mod_year > current_year:
+                    current = True
+                elif mod_year == current_year:
+                    if int(module['Semester']) == 1:
+                        current = False
+                    else:
+                        current = (datetime.now().month < 8)
+                else:
+                    current = False
+
+                curr_mod = Module.query.filter_by(module_code=module_code).first()
+
+                if not curr_mod:
+                    curr_mod = Module(module_code=module_code, name=module_name)
+                    db.session.add(curr_mod)
+
+                db_user.takes(curr_mod, current)
+
+            db.session.add(db_user)   
             login_user(db_user)
 
             return render_template('index.html', name=name.title())
@@ -139,18 +211,18 @@ def index():
 @login_required
 def get_help():
     consults = Consultation.query.all()
-    consults_im_attending = current_user.attending.all()
-    consults_im_teaching = current_user.teaching
-    modules_im_taking = UserAPI(session['token']).get_modules_names()
-    consults_to_display = [consult for consult in consults if consult not in consults_im_teaching and consult.not_full() and (consult.module_code in modules_im_taking)]
+    consults_im_attending = sorted(current_user.attending.all(), key=lambda x: x.consult_date)
+    consults_im_teaching = sorted(current_user.teaching, key=lambda x: x.consult_date)
+    modules_im_taking = current_user.current_mods.all()
+    consults_to_display = [consult for consult in consults if consult not in consults_im_teaching and consult.not_full() and (consult.module in modules_im_taking)]
     return render_template('get_help.html', consults=consults_to_display, consults_im_attending=consults_im_attending, User=User)
 
 @app.route('/provide_help', methods=['GET', 'POST'])
 @login_required
 def provide_help():
     form = NewConsultForm()
-    mods = UserAPI(session['token']).get_modules_taken_names()
-    mod_choices = [(mod, mod) for mod in mods]
+    mods = current_user.modules_taken.all()
+    mod_choices = [(mod.module_code, str(mod)[8:-1]) for mod in mods]
     form.module_code.choices = mod_choices
 
     if form.validate_on_submit():
