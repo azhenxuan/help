@@ -5,7 +5,8 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate, MigrateCommand
 from flask_wtf import Form
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
-from wtforms import SubmitField, SelectField, StringField
+from wtforms import SubmitField, SelectField, StringField, IntegerField 
+from wtforms.validators import Required, NumberRange
 from wtforms_components import DateField, TimeField
 from datetime import datetime
 from api import *
@@ -97,12 +98,12 @@ class User(UserMixin, db.Model):
 #########
 
 class NewConsultForm(Form):
-    module_code  = SelectField('Module Code', choices = [])
-    date         = StringField('Date', id="datepicker")
-    start        = StringField('Start', id="start")
-    end          = StringField('End', id="end")
-    venue        = StringField('Venue')
-    max_students = SelectField('Max no. of students: ', choices = [(1, "1"), (5, "5"), (10, "10"), (15, "15"), (20, "20")], coerce=int)
+    module_code  = SelectField('Module Code', choices = [], validators=[Required()])
+    date         = StringField('Date', id="datepicker", validators=[Required()])
+    start        = StringField('Start', id="start", validators=[Required()])
+    end          = StringField('End', id="end", validators=[Required()])
+    venue        = StringField('Venue', validators=[Required()])
+    max_students = IntegerField('Max no. of students', validators=[NumberRange(min=1, message="Please allow at least 1 student to join your class."), Required()])
     contact_details = StringField('Handphone Number (Optional)')
     submit       = SubmitField()
 
