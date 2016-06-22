@@ -6,7 +6,7 @@ from flask_migrate import Migrate, MigrateCommand
 from flask_wtf import Form
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 from wtforms import SubmitField, SelectField, StringField, IntegerField 
-from wtforms.validators import Required, NumberRange
+from wtforms.validators import Required, NumberRange, Length
 from wtforms_components import DateField, TimeField
 from datetime import datetime
 from api import *
@@ -145,10 +145,14 @@ class NewConsultForm(Form):
     start        = StringField('Start', id="start", validators=[Required()])
     end          = StringField('End', id="end", validators=[Required()])
     venue        = StringField('Venue', validators=[Required()])
-    max_students = IntegerField('Max no. of students', validators=[NumberRange(min=1, message="Please allow at least 1 student to join your class."), Required()])
-    contact_details = StringField('Handphone Number (Optional)')
+    max_students = IntegerField('Max no. of students', validators=[NumberRange(min=1, 
+				message="Please allow at least 1 student to join your class."), Required()])
+    contact_details = StringField('Handphone Number (Optional)', validators=[Length(max=8, 
+				message="Please input a valid phone number"), Required()])
     submit       = SubmitField()
 
+	##def time_validator(self):
+			
 ##########
 # Routes #
 ##########
@@ -214,6 +218,7 @@ def get_help():
     consults_im_attending = sorted(current_user.attending.all(), key=lambda x: x.consult_date)
     consults_im_teaching = sorted(current_user.teaching, key=lambda x: x.consult_date)
     modules_im_taking = current_user.current_mods.all()
+	# Only show slots of providehelp that aren't full, not taught by self and those that are being taken in current sem.
     consults_to_display = [consult for consult in consults if consult not in consults_im_teaching and consult.not_full() and (consult.module in modules_im_taking)]
     return render_template('get_help.html', consults=consults_to_display, consults_im_attending=consults_im_attending, User=User)
 
