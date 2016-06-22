@@ -11,14 +11,10 @@
 
 {% block page_content %}
 <div class="container">
-    <div class="well">
-        <h1>HELP!</h1>
-        <p class="lead">Platform to facilitate consultations between users.</p>
-    </div>  
-
+    <h1>Fill in the form to create a new consultation.</h1>
 	<!--Form-->
     <div class="well">
-        {{ wtf.quick_form(form) }}
+        {{ wtf.quick_form(form, form_type="horizontal") }}
     </div>
 </div>
 {% endblock %}

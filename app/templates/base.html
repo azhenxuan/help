@@ -11,11 +11,14 @@
 {% block styles %}
 {{ super() }}
 <link rel="stylesheet"
-      href="{{url_for('.static', filename='css/main.css')}}">
+      href="{{url_for('static', filename='main.css')}}">
+<!-- Custom Fonts -->
+<link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css">
+<link href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic" rel="stylesheet" type="text/css">
 {% endblock %}
 
 {% block navbar %}
-<div class="navbar navbar-inverse" role="navigation">
+<div class="navbar navbar-inverse navbar-static-top" role="navigation">
     <div class="container">
         <div class="navbar-header">
             <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
@@ -27,14 +30,13 @@
             <a class="navbar-brand" href="/">Help</a>
         </div>
         <div class="navbar-collapse collapse">
-            <ul class="nav navbar-nav">
+            <ul class="nav navbar-nav navbar-right">
                 <li><a href="/">Home</a></li>
                 
                 {% if current_user.is_authenticated %}
-                <li><a href="logout">Log Out</a></li>
                 <li><a href="get_help">Get Help</a></li>
                 <li><a href="provide_help">Provide Help</a></li>
-                <li><a href="see_schedule">See Schedule</a></li>
+                <li><a href="logout">Log Out</a></li>
                 {% else %}
                 <li><a href="https://ivle.nus.edu.sg/api/login/?apikey=UY5RaT4yK3lgWflM47CJo&url=http%3A%2F%2F127.0.0.1:5000">Log In</a></li>
                 {% endif %}
@@ -59,4 +61,5 @@
 
 {% block scripts %}
 {{ super() }}
+<script src="https://use.fontawesome.com/ad691dc47b.js"></script>
 {% endblock %}
