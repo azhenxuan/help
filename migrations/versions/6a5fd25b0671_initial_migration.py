@@ -1,13 +1,13 @@
 """initial migration
 
-Revision ID: 4a1b45665415
+Revision ID: 6a5fd25b0671
 Revises: None
-Create Date: 2016-06-19 22:29:52.441523
+Create Date: 2016-06-22 14:19:22.567749
 
 """
 
 # revision identifiers, used by Alembic.
-revision = '4a1b45665415'
+revision = '6a5fd25b0671'
 down_revision = None
 
 from alembic import op
@@ -43,7 +43,8 @@ def upgrade():
     op.create_table('usermodules',
     sa.Column('user_id', sa.String(length=20), nullable=False),
     sa.Column('module_id', sa.String(length=40), nullable=False),
-    sa.Column('currently_taking', sa.Boolean(), nullable=True),
+    sa.Column('year', sa.Integer(), nullable=True),
+    sa.Column('sem', sa.Integer(), nullable=True),
     sa.ForeignKeyConstraint(['module_id'], ['modules.module_code'], ),
     sa.ForeignKeyConstraint(['user_id'], ['users.user_id'], ),
     sa.PrimaryKeyConstraint('user_id', 'module_id')

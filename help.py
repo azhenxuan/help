@@ -9,6 +9,7 @@ from wtforms import SubmitField, SelectField, StringField, IntegerField
 from wtforms.validators import Required, NumberRange
 from wtforms_components import DateField, TimeField
 from datetime import datetime
+from threading import Thread
 from api import *
 import requests
 import json
@@ -50,7 +51,8 @@ class UserModule(db.Model):
     __tablename__ = 'usermodules'
     user_id = db.Column(db.String(20), db.ForeignKey('users.user_id'), primary_key=True)
     module_id = db.Column(db.String(40), db.ForeignKey('modules.module_code'), primary_key=True)
-    currently_taking = db.Column(db.Boolean)
+    year = db.Column(db.Integer)
+    sem = db.Column(db.Integer)
 
 class Consultation(db.Model):
     __tablename__ = 'consultations'
@@ -104,9 +106,21 @@ class User(UserMixin, db.Model):
     def get_id(self):
         return self.user_id.encode('utf-8')
 
-    def takes(self, module, current):
-        t = UserModule(user=self, module=module, currently_taking=current)
+    def takes(self, module, year, sem):
+        t = UserModule(user=self, module=module, year=year, sem=sem)
         db.session.add(t)
+
+    def currently_taking(self, year, sem):
+        current_year = datetime.now().year
+        if year > current_year:
+            return True
+        elif year == current_year:
+            if int(module['Semester']) == 1:
+                return False
+            else:
+                return (datetime.now().month < 8)
+        else:
+            return False
 
     @property
     def modules_taken(self):
@@ -114,7 +128,9 @@ class User(UserMixin, db.Model):
 
     @property
     def current_mods(self):
-        return Module.query.join(UserModule, UserModule.module_id == Module.module_code).filter(UserModule.user_id == self.user_id and Module.currently_taking==True)
+        return Module.query.join(UserModule, UserModule.module_id == Module.module_code).filter(
+            UserModule.user_id == self.user_id and \
+            self.currently_taking(Module.year, Module.sem))
 
 class Module(db.Model):
     __tablename__ = 'modules'
@@ -168,38 +184,38 @@ def index():
             # Create user if not in db
             if not db_user:
                 db_user = User(name=name, user_id=user_id)
+            
+            db.session.add(db_user)
 
-            # Clear all modules
-            for mod in db_user.modules.all():
-                db_user.modules.remove(mod)
+            def update_modules(user_api):
+                with app.app_context():
+                    # Get your modules
+                    user_id = user_api.get_user_id()
+                    db_user = User.query.get(user_id)
+                    modules_taken = user_api.get_modules_taken()
 
-            # Get your modules
-            modules_taken = user.get_modules_taken()
-            for module in modules_taken:
-                module_name = module['ModuleTitle']
-                module_code = module['ModuleCode']
+                    if len(modules_taken) == len(db_user.current_mods.all()):
+                        return
+                    
+                    for module in modules_taken:
+                        module_name = module['ModuleTitle']
+                        module_code = module['ModuleCode']
+                        module_year = int(module['AcadYear'].split('/')[1])
+                        module_sem = int(module['Semester'])
 
-                current_year = datetime.now().year
-                mod_year = int(module['AcadYear'].split('/')[1])
-                if mod_year > current_year:
-                    current = True
-                elif mod_year == current_year:
-                    if int(module['Semester']) == 1:
-                        current = False
-                    else:
-                        current = (datetime.now().month < 8)
-                else:
-                    current = False
+                        curr_mod = Module.query.filter_by(module_code=module_code).first()
 
-                curr_mod = Module.query.filter_by(module_code=module_code).first()
+                        if not curr_mod:
+                            curr_mod = Module(module_code=module_code, name=module_name)
+                            db.session.add(curr_mod)
 
-                if not curr_mod:
-                    curr_mod = Module(module_code=module_code, name=module_name)
-                    db.session.add(curr_mod)
+                        db_user.takes(curr_mod, year=module_year, sem=module_sem)
 
-                db_user.takes(curr_mod, current)
+            ##### START PROCESS IN THREAD #####
+            thr = Thread(target=update_modules, args=[user])
+            thr.start()
+            ##### END PROCESS IN THREAD #####
 
-            db.session.add(db_user)   
             login_user(db_user)
 
             return render_template('index.html', name=name.title())
@@ -222,6 +238,8 @@ def get_help():
 def provide_help():
     form = NewConsultForm()
     mods = current_user.modules_taken.all()
+    if not len(mods):
+        flash("Wait, we don't have your modules yet! Please refresh the page so we can find them. Thanks!")
     mod_choices = [(mod.module_code, str(mod)[8:-1]) for mod in mods]
     form.module_code.choices = mod_choices
 
