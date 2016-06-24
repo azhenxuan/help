@@ -5,10 +5,10 @@
 {% block page_content %}
 <div class="container">
 	<!--Add a box representing consult for every valid consult-->
-	{% for consult in consults %}
     <h1>Consults</h1>
+	{% for consult in consults %}
     <a href="join_class/{{consult.consult_id}}" {% if consult in consults_im_attending %}class="btn btn-default disabled"{% else %}class="btn btn-default"{% endif %}>
-		<div class="col-md-3 col-sm-6">
+		<div class="col-md-3 col-xs-6">
 			<div class="mod-name">
 				<h2>{{ consult.module_code }}</h2>
 			</div>
@@ -17,6 +17,7 @@
 				<p>{{ consult.venue }}</p>
 				<p>{{ User.query.get(consult.teacher_id).name.title() }}</p>
 				<p>{{ consult.attendees.all()|length }}/{{ consult.num_of_students }} Slots Filled</p>
+				<p>{{ consult.start.strftime("%I:%M %p") }} - {{ consult.end.strftime("%I:%M %p") }}</p>
 			</div>
 		</div>
 	</a>
