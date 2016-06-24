@@ -62,8 +62,9 @@ to waste my time*.
 *get better help from Profs and TAs next time*.
 
 ## Progress and Milestone 3 Plans
-### Completion 
-
+### Completed features 
+1. Core feature 1 to 5 has been established
+2. Debugged many web app display issues
 
 ## Project Log
 [Link to Google Sheets](https://docs.google.com/spreadsheets/d/1irWFqA-WFoaXJmSb0RhwxuIm9TfVC-xpZLDoqmZmDJ4/edit?usp=sharing)
