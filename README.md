@@ -62,9 +62,11 @@ to waste my time*.
 *get better help from Profs and TAs next time*.
 
 ## Progress and Milestone 3 Plans
-### Completed features 
+### Features completed this sprint 
 1. Core feature 1 to 5 has been established
 2. Debugged many web app display issues
+
+### Features to be completed by next sprint
 
 ## Project Log
 [Link to Google Sheets](https://docs.google.com/spreadsheets/d/1irWFqA-WFoaXJmSb0RhwxuIm9TfVC-xpZLDoqmZmDJ4/edit?usp=sharing)
