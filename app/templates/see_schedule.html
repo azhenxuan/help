@@ -11,7 +11,8 @@
     <div class="container-fluid">
         <div class="get-help col-md-6 col-sm-6 col-xs-6">
             <div class="well">
-                <h2>Get Help</h2>
+                <h2 class="text-center">Get Help</h2>
+                <hr>
 
                 {% if not get_help %}
                 <p class="lead">You haven't signed up for any consults yet! <a href="/get_help">Join a class</a>.</p>
@@ -47,7 +48,8 @@
         </div>
         <div class="give-help col-md-6 col-sm-6 col-xs-6">
             <div class="well">
-                <h2>Provide Help</h2>
+                <h2 class="text-center">Provide Help</h2>
+                <hr>
                 {% if not give_help %}
                 <p class="lead">You haven't offered any consults yet! Create a <a href="/provide_help">new consult</a>.</p>
                 {% endif %}

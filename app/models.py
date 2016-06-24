@@ -1,5 +1,7 @@
 from flask_login import UserMixin
 from . import db, login_manager
+from datetime import datetime
+from sqlalchemy.ext.hybrid import hybrid_property
 
 ##########
 # Models #
@@ -37,7 +39,7 @@ class Consultation(db.Model):
 
     def not_full(self):
         return (len(self.attendees.all()) < self.num_of_students)
-    
+
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
     user_id = db.Column(db.String(20), primary_key=True)

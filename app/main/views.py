@@ -68,7 +68,7 @@ def index():
 @main.route('/get_help')
 @login_required
 def get_help():
-    consults = Consultation.query.all()
+    consults = Consultation.query.filter(Consultation.consult_date >= datetime.date(datetime.now())).all()
     consults_im_attending = sorted(current_user.attending.all(), key=lambda x: x.consult_date)
     consults_im_teaching = sorted(current_user.teaching, key=lambda x: x.consult_date)
     modules_im_taking = current_user.current_mods.all()
