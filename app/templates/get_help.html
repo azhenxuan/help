@@ -8,7 +8,7 @@
     <h1>Consults</h1>
 	{% for consult in consults %}
 	<div class="col-md-3 col-xs-4">
-    	<a href="join_class/{{consult.consult_id}}" {% if consult in consults_im_attending %}class="btn btn-default disabled"{% else %}class="btn btn-default"{% endif %}>
+    	<a href="join_class/{{consult.consult_id}}" {% if consult in consults_im_attending %}class="btn btn-default disabled"{% else %}class="btn btn-default btn-block"{% endif %}>
     		<div class="consult">
 				<div class="mod-name">
 					<h2>{{ consult.module_code }}</h2>
