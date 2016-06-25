@@ -9,82 +9,86 @@
     <hr>
     <!--Form-->
     <div class="container-fluid">
-        <div class="get-help col-sm-6 col-xs-12 well">
-            <h2 class="text-center">Get Help</h2>
-            <hr>
+        <div class="get-help col-sm-6 col-xs-12">
+            <div class="well">
+                <h2 class="text-center">Get Help</h2>
+                <hr>
 
-            {% if not get_help %}
-            <p class="lead">You haven't signed up for any consults yet! <a href="/get_help">Join a class</a>.</p>
-            {% endif %}
+                {% if not get_help %}
+                <p class="lead">You haven't signed up for any consults yet! <a href="/get_help">Join a class</a>.</p>
+                {% endif %}
 
-            {% for consult in get_help %}
-            <div class="container-fluid well">
-                <div class="row">
-                    <div class="col-md-3">
-                        {{consult.module_code}}
+                {% for consult in get_help %}
+                <div class="container-fluid well">
+                    <div class="row">
+                        <div class="col-md-3">
+                            {{consult.module_code}}
+                        </div>
+                        <div class="col-md-3">
+                            {{ User.query.filter_by(user_id=consult.teacher_id).first().name.title() }}
+                        </div>
+                        <div class="col-md-3">
+                            {{ consult.consult_date }}<br>
+                            {{ consult.start.strftime("%I:%M %p") }} - 
+                            {{ consult.end.strftime("%I:%M %p") }}
+                        </div>
+                        <div class="col-md-3">
+                            {{ consult.venue }}
+                        </div>
                     </div>
-                    <div class="col-md-3">
-                        {{ User.query.filter_by(user_id=consult.teacher_id).first().name.title() }}
-                    </div>
-                    <div class="col-md-3">
-                        {{ consult.consult_date }}<br>
-                        {{ consult.start.strftime("%I:%M %p") }} - 
-                        {{ consult.end.strftime("%I:%M %p") }}
-                    </div>
-                    <div class="col-md-3">
-                        {{ consult.venue }}
+                    <br>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <a href="quit_class/{{consult.consult_id}}" class="btn btn-block btn-default" aria-label="Quit">
+                              <strong>Quit</strong>
+                            </a>
+                        </div>
                     </div>
                 </div>
-                <br>
-                <div class="row">
-                    <div class="col-md-12">
-                        <a href="quit_class/{{consult.consult_id}}" class="btn btn-block btn-default" aria-label="Quit">
-                          <strong>Quit</strong>
-                        </a>
-                    </div>
-                </div>
+                {% endfor %}
             </div>
-            {% endfor %}
         </div>
         <div class="give-help col-sm-6 col-xs-12">
-            <h2 class="text-center">Provide Help</h2>
-            <hr>
-            {% if not give_help %}
-            <p class="lead">You haven't offered any consults yet! Create a <a href="/provide_help">new consult</a>.</p>
-            {% endif %}
-            {% for consult in give_help %}
-            <div class="container-fluid well consult">
-                <div class="row">
-                    <div class="col-md-3">
-                        {{consult.module_code}}
+            <div class="well">
+                <h2 class="text-center">Provide Help</h2>
+                <hr>
+                {% if not give_help %}
+                <p class="lead">You haven't offered any consults yet! Create a <a href="/provide_help">new consult</a>.</p>
+                {% endif %}
+                {% for consult in give_help %}
+                <div class="container-fluid well consult">
+                    <div class="row">
+                        <div class="col-md-3">
+                            {{consult.module_code}}
+                        </div>
+                        <div class="col-md-3">
+                            {{ consult.attendees.all()|length }}/{{ consult.num_of_students }} Filled
+                        </div>
+                        <div class="col-md-3">
+                            {{ consult.consult_date }}<br>
+                            {{ consult.start.strftime("%I:%M %p") }} - 
+                            {{ consult.end.strftime("%I:%M %p") }}
+                        </div>
+                        <div class="col-md-3">
+                            {{ consult.venue }}
+                        </div>
                     </div>
-                    <div class="col-md-3">
-                        {{ consult.attendees.all()|length }}/{{ consult.num_of_students }} Filled
-                    </div>
-                    <div class="col-md-3">
-                        {{ consult.consult_date }}<br>
-                        {{ consult.start.strftime("%I:%M %p") }} - 
-                        {{ consult.end.strftime("%I:%M %p") }}
-                    </div>
-                    <div class="col-md-3">
-                        {{ consult.venue }}
+                    <br>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <a href="update_class?consult_id={{consult.consult_id}}" class="btn btn-block btn-default" aria-label="Update">
+                              <strong>Update</strong>
+                            </a>
+                        </div>
+                        <div class="col-md-6">
+                            <a href="delete_class/{{consult.consult_id}}" class="btn btn-block btn-default" aria-label="Update">
+                              <strong>Delete</strong>
+                            </a>
+                        </div>
                     </div>
                 </div>
-                <br>
-                <div class="row">
-                    <div class="col-md-6">
-                        <a href="update_class?consult_id={{consult.consult_id}}" class="btn btn-block btn-default" aria-label="Update">
-                          <strong>Update</strong>
-                        </a>
-                    </div>
-                    <div class="col-md-6">
-                        <a href="delete_class/{{consult.consult_id}}" class="btn btn-block btn-default" aria-label="Update">
-                          <strong>Delete</strong>
-                        </a>
-                    </div>
-                </div>
+                {% endfor %}
             </div>
-            {% endfor %}
         </div>
     </div>
 </div>
