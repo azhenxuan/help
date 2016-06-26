@@ -1,5 +1,30 @@
 # Project HELP
+	
+## Status Update for Milestone 2
 
+The progress of Project Help has been in-line with expectations. A demo of the
+application (note that this is still a work-in-progress) is available [here](http://nus-help.herokuapp.com).
+We have also prepared a [short video](https://youtu.be/3HfA9drTI4k) demonstrating 
+the features available. As can be seen,  we have implemented the basic features, 
+including IVLE login and simple adding and joining of modules is available. 
+
+For the next milestone, we plan to work on two main areas, maintainability and 
+usability.
+
+### Maintability
+Our current app and its code base is still small, and we were able to get this
+far without writing a whole bunch of tests. However, to move beyond this point,
+we feel that we would need to include a comprehensive set of tests to ensure we 
+don't break our app while trying to improve it.
+
+### Usability
+During the past month, we have been overly focused on the technical aspects of 
+building the app. At some point, we lost sight of users' needs. To fix this, we
+plan to enlist some of our friends to test the app. We will then gather their
+feedback on work on the problems they've identified, and perhaps include some
+features they feel would be critical to the application's success.
+
+## Introduction
 A web-based help-session scheduler.
 
 We are Team HELP, which comprises two BZA students, Zhen Xuan and Ken.
@@ -31,21 +56,19 @@ OR into corporate environments where employees want to schedule face-time with
 higher-ups?
 
 ## Features
-### Core
-
+### Completed
 1. (Student) Register for GetHelp sessions
 2. (Users)   Set time slots for ProvideHelp sessions
 3. (Student) Able to see schedule for GetHelp & ProvideHelp sessions for 
 him/herself
-4. (Student) Automatic inclusion of mods taken this sem (feature availability 
-dependent on IVLE API)
+4. (Student) Automatically display mods taken this sem 
 5. (Student) Automatically filters irrelevant GetHelp sessions which provides
 a cleaner view for users
 
-### Stretch Goals
-
+### Next Sprint (Subject to change based on user feedback)
 1. (Users)   Blacklist students that don't turn up
-2. (Student) Add feedback for help sessions
+2. (Users)   Consult modal that shows details about the consult
+3. (Student) Add feedback for help sessions
 
 ## User Stories
 1. As a **Student**, I want to *register for help sessions*, so I can 
@@ -60,13 +83,6 @@ can *get started quickly without much setup needed*.
 to waste my time*.
 6. As a **Student**, I want to *provide feedback on help sessions*, so I can 
 *get better help from Profs and TAs next time*.
-
-## Progress and Milestone 3 Plans
-### Features completed this sprint 
-1. Core feature 1 to 5 has been established
-2. Debugged many web app display issues
-
-### Features to be completed by next sprint
 
 ## Project Log
 [Link to Google Sheets](https://docs.google.com/spreadsheets/d/1irWFqA-WFoaXJmSb0RhwxuIm9TfVC-xpZLDoqmZmDJ4/edit?usp=sharing)
