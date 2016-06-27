@@ -72,7 +72,7 @@ a cleaner view for users
 
 ## User Stories
 1. As a **Student**, I want to *register for help sessions*, so I can 
-*get *.
+*arrange for consults easily*.
 2. As a **User**, I want to *place help sessions up for registration*, so I can 
 *provide help to students/peers who need it urgently*.
 3. As a **Student**, I want to *have an easy schedule to refer to*, so I can
