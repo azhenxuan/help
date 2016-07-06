@@ -89,6 +89,3 @@ to waste my time*.
 
 ## Kickoff Video
 [Link to Milestone 2 Video](https://youtu.be/3HfA9drTI4k)
-
-## License
-This project is licensed under the MIT license. Please refer to LICENSE for further details.
