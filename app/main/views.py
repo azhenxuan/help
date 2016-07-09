@@ -69,10 +69,11 @@ def index():
 @login_required
 def get_help():
     consults = Consultation.query.filter(Consultation.consult_date >= datetime.date(datetime.now())).all()
-    consults_im_attending = sorted(current_user.attending.all(), key=lambda x: x.consult_date)
-    consults_im_teaching = sorted(current_user.teaching, key=lambda x: x.consult_date)
+    consults_im_attending = current_user.attending.all()
+    consults_im_teaching = current_user.teaching
     modules_im_taking = current_user.current_mods.all()
     consults_to_display = [consult for consult in consults if consult not in consults_im_teaching and consult.not_full() and (consult.module in modules_im_taking)]
+    consults_to_display.sort(key=lambda x: x.consult_date)
     return render_template('get_help.html', consults=consults_to_display, consults_im_attending=consults_im_attending, User=User)
 
 @main.route('/provide_help', methods=['GET', 'POST'])
