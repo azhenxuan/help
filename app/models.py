@@ -44,7 +44,7 @@ class User(UserMixin, db.Model):
     __tablename__ = 'users'
     user_id = db.Column(db.String(20), primary_key=True)
     name = db.Column(db.String(40))
-    teaching = db.relationship('Consultation', backref='teacher')
+    teaching = db.relationship('Consultation', backref='teacher', lazy='dynamic')
     modules = db.relationship('UserModule',
                               foreign_keys=[UserModule.user_id],
                               backref=db.backref('user', lazy='joined'),
@@ -100,7 +100,7 @@ class Module(db.Model):
     __tablename__ = 'modules'
     module_code = db.Column(db.String(40), primary_key=True)
     name = db.Column(db.String(60))
-    consults = db.relationship('Consultation', backref='module')
+    consults = db.relationship('Consultation', backref='module', lazy='dynamic')
     modules = db.relationship('UserModule',
                               foreign_keys=[UserModule.module_id],
                               backref=db.backref('module', lazy='joined'),
