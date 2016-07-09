@@ -1,5 +1,5 @@
 # Project HELP
-	
+
 ## Status Update for Milestone 2
 
 The progress of Project Help has been in-line with expectations. A demo of the

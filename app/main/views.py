@@ -103,8 +103,8 @@ def provide_help():
 @main.route('/home')
 @login_required
 def home():
-    get_help = current_user.attending.all()
-    give_help = current_user.teaching
+    get_help = current_user.attending.filter(Consultation.consult_date >= datetime.date(datetime.now())).all()
+    give_help = current_user.teaching.filter(Consultation.consult_date >= datetime.date(datetime.now())).all()
     return render_template('see_schedule.html', get_help=get_help, give_help=give_help, User=User)
 
 @main.route('/join_class/<consult_id>')
