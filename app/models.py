@@ -1,6 +1,7 @@
 from flask_login import UserMixin
 from . import db, login_manager
 from datetime import datetime
+from sqlalchemy import or_, and_
 from sqlalchemy.ext.hybrid import hybrid_property
 
 ##########
@@ -78,11 +79,8 @@ class User(UserMixin, db.Model):
         current_year = datetime.now().year
         if year > current_year:
             return True
-        elif year == current_year:
-            if int(module['Semester']) == 1:
-                return False
-            else:
-                return (datetime.now().month < 8)
+        elif year == current_year and sem != 1:
+            return (datetime.now().month < 8)
         else:
             return False
 
@@ -93,8 +91,13 @@ class User(UserMixin, db.Model):
     @property
     def current_mods(self):
         return Module.query.join(UserModule, UserModule.module_id == Module.module_code).filter(
-            UserModule.user_id == self.user_id and \
-            self.currently_taking(Module.year, Module.sem))
+            UserModule.user_id == self.user_id,
+            or_(UserModule.year > datetime.now().year,
+                and_(UserModule.year == datetime.now().year, 
+                 UserModule.sem != 1,
+                 (datetime.now().month < 8)
+                )
+            ))
 
 class Module(db.Model):
     __tablename__ = 'modules'

@@ -36,8 +36,8 @@ def index():
                     db_user = User.query.get(user_id)
                     modules_taken = user_api.get_modules_taken()
 
-                    if len(modules_taken) == len(db_user.current_mods.all()):
-                        return
+                    # if len(modules_taken) == len(db_user.current_mods.all()):
+                    #     return
                     
                     for module in modules_taken:
                         module_name = module['ModuleTitle']
@@ -74,7 +74,13 @@ def get_help():
     modules_im_taking = current_user.current_mods.all()
     consults_to_display = [consult for consult in consults if consult not in consults_im_teaching and consult.not_full() and (consult.module in modules_im_taking)]
     consults_to_display.sort(key=lambda x: x.consult_date)
-    return render_template('get_help.html', consults=consults_to_display, consults_im_attending=consults_im_attending, User=User)
+
+    module_codes = [module.module_code for module in modules_im_taking]
+    return render_template('get_help.html', 
+                           consults=consults_to_display, 
+                           consults_im_attending=consults_im_attending, 
+                           module_codes=module_codes, 
+                           User=User)
 
 @main.route('/provide_help', methods=['GET', 'POST'])
 @login_required
@@ -104,8 +110,8 @@ def provide_help():
 @main.route('/home')
 @login_required
 def home():
-    get_help = current_user.attending.filter(Consultation.consult_date >= datetime.date(datetime.now())).all()
-    give_help = current_user.teaching.filter(Consultation.consult_date >= datetime.date(datetime.now())).all()
+    get_help = sorted(current_user.attending.filter(Consultation.consult_date >= datetime.date(datetime.now())).all(), key=lambda x: x.consult_date)
+    give_help = sorted(current_user.teaching.filter(Consultation.consult_date >= datetime.date(datetime.now())).all(), key=lambda x: x.consult_date)
     return render_template('see_schedule.html', get_help=get_help, give_help=give_help, User=User)
 
 @main.route('/join_class/<consult_id>')
