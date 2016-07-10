@@ -28,6 +28,7 @@ def index():
                 db_user = User(name=name, user_id=user_id)
             
             db.session.add(db_user)
+            db.session.commit()
 
             def update_modules(app, user_api):
                 with app.app_context():
@@ -36,8 +37,8 @@ def index():
                     db_user = User.query.get(user_id)
                     modules_taken = user_api.get_modules_taken()
 
-                    # if len(modules_taken) == len(db_user.current_mods.all()):
-                    #     return
+                    if len(modules_taken) == len(db_user.modules_taken.all()):
+                        return
                     
                     for module in modules_taken:
                         module_name = module['ModuleTitle']

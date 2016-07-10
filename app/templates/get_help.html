@@ -7,11 +7,13 @@
     <!--Add a box representing consult for every valid consult-->
     <h1>Consults</h1>
     {% if consults %}
-    <div class="btn-group filter-btn-group">
-        <button type="button" class="btn btn-secondary" data-filter="*">show all</button>
-        {% for module_code in module_codes %}
-        <button type="button" class="btn btn-secondary" data-filter=".{{ module_code }}">{{ module_code }}</button>
-        {% endfor %}
+    <div class="container">
+        <div class="btn-group filter-btn-group">
+            <button type="button" class="btn btn-secondary active" data-filter="*">show all</button>
+            {% for module_code in module_codes %}
+            <button type="button" class="btn btn-secondary" data-filter=".{{ module_code }}">{{ module_code }}</button>
+            {% endfor %}
+        </div>
     </div>
     <div class="grid">
         {% for consult in consults %}
@@ -51,6 +53,10 @@
     $('.filter-btn-group').on( 'click', 'button', function() {
       var filterValue = $(this).attr('data-filter');
       $('.grid').isotope({ filter: filterValue });
+    });
+
+    $(".btn-group > .btn").click(function(){
+        $(this).addClass("active").siblings().removeClass("active");
     });
 </script>
 {% endblock %}

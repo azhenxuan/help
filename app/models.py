@@ -56,7 +56,6 @@ class User(UserMixin, db.Model):
         return '<User {id}: {name}>'.format(id=self.user_id, name=self.name)
 
     def is_authenticated(self):
-        return True
         if session.get('token'):
             user = UserAPI(session['token'])
             return user.logged_in()
