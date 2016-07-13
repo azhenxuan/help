@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block subtitle %}Get Help{% endblock %}
+
+{% block page_content %}
+<div class="container">
+    <!--Add a box representing consult for every valid consult-->
+    <h1>Consults</h1>
+    {% if consults %}
+    <div class="container">
+        <div class="btn-group filter-btn-group">
+            <button type="button" class="btn btn-secondary active" data-filter="*">show all</button>
+            {% for module_code in module_codes %}
+            <button type="button" class="btn btn-secondary" data-filter=".{{ module_code }}">{{ module_code }}</button>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="grid">
+        {% for consult in consults %}
+        <div class="col-md-3 col-sm-6 col-xs-12 consult-slot grid-item {{ consult.module_code }}">
+            <a href="join_class/{{consult.consult_id}}" {% if consult in consults_im_attending %}class="btn btn-default btn-block disabled"{% else %}class="btn btn-default btn-block"{% endif %}>
+                <div class="consult-box">
+                    <div class="mod-name">
+                        <h2>{{ consult.module_code }}</h2>
+                    </div>
+                    <div class="consult-info">
+                        <p>{{ consult.consult_date }}</p>
+                        <p>{{ consult.venue }}</p>
+                        <p>{{ User.query.get(consult.teacher_id).name.title() }}</p>
+                        <p>{{ consult.attendees.all()|length }}/{{ consult.num_of_students }} Slots Filled</p>
+                        <p>{{ consult.start.strftime("%I:%M %p") }} - {{ consult.end.strftime("%I:%M %p") }}</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        {% endfor %}
+    {% else %}
+        <h1>Looks like we don't have any consults right now...</h1>
+    {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script src="https://npmcdn.com/isotope-layout@3.0/dist/isotope.pkgd.min.js"></script>
+<script>
+    $('.grid').isotope({
+      itemSelector: '.grid-item'
+    });
+
+    // filter items on button click
+    $('.filter-btn-group').on( 'click', 'button', function() {
+      var filterValue = $(this).attr('data-filter');
+      $('.grid').isotope({ filter: filterValue });
+    });
+
+    $(".btn-group > .btn").click(function(){
+        $(this).addClass("active").siblings().removeClass("active");
+    });
+</script>
+{% endblock %}

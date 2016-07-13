@@ -1,0 +1,73 @@
+/* Body */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.alert {
+  font-family: "Montserrat", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-weight: 700;
+}
+
+body {
+  font-family: "Montserrat", "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+/* Body End */
+
+/* Navbar */
+@media (min-width: 768px) {
+  .navbar-fixed-top {
+    padding: 25px 0;
+    -webkit-transition: padding 0.3s;
+    -moz-transition: padding 0.3s;
+    transition: padding 0.3s;
+  }
+  .navbar-fixed-top .navbar-brand {
+    font-size: 2em;
+    -webkit-transition: all 0.3s;
+    -moz-transition: all 0.3s;
+    transition: all 0.3s;
+  }
+}
+.navbar {
+  font-family: "Montserrat", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+.navbar a:focus {
+  outline: none;
+}
+.navbar .navbar-nav {
+  letter-spacing: 1px;
+}
+.navbar .navbar-nav li a:focus {
+  outline: none;
+}
+.navbar-default,
+.navbar-inverse {
+  border: none;
+}
+.navbar-brand {
+	margin-left: 0px !important; 
+	font-size: 2em;
+}
+/* Navbar End */
+
+.get-help .well .consult {
+	background-color: #617FD0;
+	font-weight: bold;
+}
+
+.give-help .well .consult {
+	background-color: #EFD653;
+	font-weight: bold;
+}
+
+.blush {
+	background-color: #EFD653 !important
+}
+
+.consult-slot {
+  padding: 10px 10px 10px 10px;
+}

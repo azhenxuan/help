@@ -1,5 +1,30 @@
 # Project HELP
 
+## Status Update for Milestone 2
+
+The progress of Project Help has been in-line with expectations. A demo of the
+application (note that this is still a work-in-progress) is available [here](http://nus-help.herokuapp.com).
+We have also prepared a [short video](https://youtu.be/3HfA9drTI4k) demonstrating 
+the features available. As can be seen,  we have implemented the basic features, 
+including IVLE login and simple adding and joining of modules is available. 
+
+For the next milestone, we plan to work on two main areas, maintainability and 
+usability.
+
+### Maintability
+Our current app and its code base is still small, and we were able to get this
+far without writing a whole bunch of tests. However, to move beyond this point,
+we feel that we would need to include a comprehensive set of tests to ensure we 
+don't break our app while trying to improve it.
+
+### Usability
+During the past month, we have been overly focused on the technical aspects of 
+building the app. At some point, we lost sight of users' needs. To fix this, we
+plan to enlist some of our friends to test the app. We will then gather their
+feedback on work on the problems they've identified, and perhaps include some
+features they feel would be critical to the application's success.
+
+## Introduction
 A web-based help-session scheduler.
 
 We are Team HELP, which comprises two BZA students, Zhen Xuan and Ken.
@@ -11,10 +36,6 @@ Our solution is a web application where students can signal their need for
 assistance, before they fall deeper into CAP hell. Upon seeing the demand for
 their services, TAs and Profs will (hopefully) start opening up time slots that
 students can ballot for.  
-
-## TODO:
-1. Add exception for invalid tokens
-2. Consultation Item Page
 
 ## Team HELP
 - Ang Zhen Xuan
@@ -35,29 +56,30 @@ OR into corporate environments where employees want to schedule face-time with
 higher-ups?
 
 ## Features
-### Core
+### Completed
+1. (Student) Register for GetHelp sessions
+2. (Users)   Set time slots for ProvideHelp sessions
+3. (Student) Able to see schedule for GetHelp & ProvideHelp sessions for 
+him/herself
+4. (Student) Automatically display mods taken this sem 
+5. (Student) Automatically filters irrelevant GetHelp sessions which provides
+a cleaner view for users
 
-1. (Student) Indicate need for help
-2. (Staff)   Set time slots for help sessions
-3. (Student) Select and rank time slots
-4. (Student) Automatic inclusion of mods taken this sem (feature availability 
-dependent on API)
-
-### Stretch Goals
-
-1. (Staff)   Blacklist students that don't turn up
-2. (Student) Add feedback for help sessions
+### Next Sprint (Subject to change based on user feedback)
+1. (Users)   Blacklist students that don't turn up
+2. (Users)   Consult modal that shows details about the consult
+3. (Student) Add feedback for help sessions
 
 ## User Stories
-1. As a **Student**, I want to *indicate interest in help sessions*, so I can 
-*get TAs and Profs to take notice*.
-2. As a **Staff**, I want to *set timings for help sessions*, so I can *plan my*
-*time properly*.
-3. As a **Student**, I want to *select and ballot for help sessions*, so I can
-*get timely help*.
+1. As a **Student**, I want to *register for help sessions*, so I can 
+*arrange for consults easily*.
+2. As a **User**, I want to *place help sessions up for registration*, so I can 
+*provide help to students/peers who need it urgently*.
+3. As a **Student**, I want to *have an easy schedule to refer to*, so I can
+*save time checking back on my registered consults*.
 4. As a **Student**, I want to *be able to see all the mods I'm taking* so I 
 can *get started quickly without much setup needed*.
-5. As a **Staff**, I want to *be able to blacklist students*, so I *won't have
+5. As a **User**, I want to *be able to blacklist students*, so I *won't have
 to waste my time*.
 6. As a **Student**, I want to *provide feedback on help sessions*, so I can 
 *get better help from Profs and TAs next time*.
@@ -66,7 +88,4 @@ to waste my time*.
 [Link to Google Sheets](https://docs.google.com/spreadsheets/d/1irWFqA-WFoaXJmSb0RhwxuIm9TfVC-xpZLDoqmZmDJ4/edit?usp=sharing)
 
 ## Kickoff Video
-TODO: new video needed
-
-## License
-This project is licensed under the MIT license. Please refer to LICENSE for further details.
+[Link to Milestone 2 Video](https://youtu.be/3HfA9drTI4k)
