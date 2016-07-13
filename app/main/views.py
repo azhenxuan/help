@@ -199,3 +199,13 @@ def logout():
     flash("You have successfully logged out.")
     return redirect(url_for('.index'))
 
+@main.route('/shutdown')
+def server_shutdown():
+    if not current_app.testing:
+        abort(404)
+    shutdown = request.environ.get('werkzeug.server.shutdown')
+    if not shutdown:
+        abort(500)
+    shutdown()
+    return 'Shutting down...'
+
