@@ -2,9 +2,24 @@
 
 {% block subtitle %}Home{% endblock %}
 
+{% block styles %}
+{{ super() }}
+<style>
+.content > h1 {
+    font-size: 5em !important;
+}
+
+.content > p {
+	font-size: 2em ! important;
+}
+</style>
+{% endblock %}
+
 {% block page_content %}
-<div class="container">
+<div class="text-center content">
     <h1>HELP!</h1>
-    <p class="lead">Platform to facilitate consultations between users.</p>
+    <hr>
+    <p class="lead">Platform to facilitate consultations between users</p>
+    <a class="btn btn-default btn-lg" href="https://ivle.nus.edu.sg/api/login/?apikey=UY5RaT4yK3lgWflM47CJo&url={{ url_for('main.index', _external=True)|e }}">Get Started</a>
 </div>
 {% endblock %}

@@ -43,8 +43,6 @@ def test(coverage=False):
         COV.html_report(directory=covdir)
         print('HTML version: file://%s/index.html' % covdir)
         COV.erase()
-        print("Cannot erase?")
-        return
 
 @manager.command
 def deploy():
