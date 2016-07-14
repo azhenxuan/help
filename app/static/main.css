@@ -12,6 +12,7 @@ h6,
 
 body {
   font-family: "Montserrat", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  background-color: #F6F6F6;
 }
 /* Body End */
 
@@ -70,4 +71,16 @@ body {
 
 .consult-slot {
   padding: 10px 10px 10px 10px;
+}
+
+.content {
+  height: 250px;
+
+  position: absolute;
+  top:0;
+  bottom:0;
+  left: 0;
+  right: 0;
+
+  margin: auto;
 }
