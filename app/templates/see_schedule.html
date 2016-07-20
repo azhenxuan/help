@@ -39,8 +39,8 @@
                     <br>
                     <div class="row">
                         <div class="col-md-12">
-                            <a href="quit_class/{{consult.consult_id}}" class="btn btn-block btn-default" aria-label="Quit">
-                              <strong>Quit</strong>
+                            <a href="{{ url_for('main.class_details', consult_id=consult.consult_id) }}" class="btn btn-block btn-default" aria-label="Quit">
+                              <strong>Details</strong>
                             </a>
                         </div>
                     </div>
@@ -75,14 +75,9 @@
                     </div>
                     <br>
                     <div class="row">
-                        <div class="col-md-6">
-                            <a href="update_class?consult_id={{consult.consult_id}}" class="btn btn-block btn-default" aria-label="Update">
-                              <strong>Update</strong>
-                            </a>
-                        </div>
-                        <div class="col-md-6">
-                            <a href="delete_class/{{consult.consult_id}}" class="btn btn-block btn-default" aria-label="Update">
-                              <strong>Delete</strong>
+                        <div class="col-md-12">
+                            <a href="{{ url_for('main.class_admin', consult_id=consult.consult_id) }}" class="btn btn-block btn-default" aria-label="Update">
+                              <strong>Manage</strong>
                             </a>
                         </div>
                     </div>

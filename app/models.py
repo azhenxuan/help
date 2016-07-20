@@ -29,6 +29,7 @@ class Consultation(db.Model):
     venue = db.Column(db.String(40))
     num_of_students = db.Column(db.Integer)
     contact_details = db.Column(db.String(40), nullable=True) 
+    description = db.Column(db.String(140))
     teacher_id = db.Column(db.String(20), db.ForeignKey('users.user_id'))
     attendees = db.relationship('User',
                                 secondary=registrations,
@@ -101,7 +102,7 @@ class User(UserMixin, db.Model):
 class Module(db.Model):
     __tablename__ = 'modules'
     module_code = db.Column(db.String(40), primary_key=True)
-    name = db.Column(db.String(60))
+    name = db.Column(db.String(200))
     consults = db.relationship('Consultation', backref='module', lazy='dynamic')
     modules = db.relationship('UserModule',
                               foreign_keys=[UserModule.module_id],

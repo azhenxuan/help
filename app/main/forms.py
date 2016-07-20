@@ -1,4 +1,4 @@
-from wtforms import SubmitField, SelectField, StringField, IntegerField 
+from wtforms import SubmitField, SelectField, StringField, IntegerField, TextAreaField
 from wtforms.validators import Required, NumberRange, Length
 from wtforms_components import DateField, TimeField
 from flask_wtf import Form
@@ -14,6 +14,8 @@ class NewConsultForm(Form):
         message="Please allow at least 1 student to join your class."), Required()])
     contact_details = StringField('HP Number (Optional)', validators=[Length(max=8, 
         message="Please input a valid phone number")])
+    description = TextAreaField("What're you teaching?", validators=[Length(max=140,
+        message="Please keep it to less than 140 chars"), Required()])
     submit       = SubmitField()
 
     # Check that start time is before end time

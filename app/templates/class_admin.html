@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block subtitle %}My Schedules{% endblock %}
+
+{% block page_content %}
+<div class="container">
+    <div class="row">
+        <div class="col-sm-3"></div>
+        <div class="col-sm-6 well">
+            <h1>Thanks for teaching {{ consult.module_code }}!</h1>
+            <hr>
+            <div class="col-sm-12">
+                {% if consult.attendees.all()|length %}
+                <a href="#" data-toggle="popover" title="Students" data-html=true data-placement="bottom"
+                data-content="{% for student in consult.attendees.all() %}<p>{{student.name.title()}}</p>{% endfor %}">
+                    <div class="progress">
+                      <div class="progress-bar" role="progressbar" aria-valuenow="30"
+                      aria-valuemin="0" aria-valuemax="{{ consult.num_of_students }}" 
+                      style="width:{{ consult.attendees.all()|length/consult.num_of_students*100 }}%">
+                        {{ consult.attendees.all()|length }} 
+                        {% if consult.attendees.all()|length == 1 %}
+                        student
+                        {% else %}
+                        students
+                        {% endif %}
+                      </div>
+                    </div>
+                </a>
+                {% else %}
+                <p class="lead text-center">No students yet :(</p>
+                {% endif %}
+            </div>
+
+            <!-- Consult Details -->
+            <div class="col-sm-12">
+                <div class="col-sm-1">
+                    <p class="lead">
+                        <i class="fa fa-calendar"></i>
+                    </p>
+                </div>
+                <div class="col-sm-11">
+                    <p class="lead">
+                        {{ consult.consult_date }}
+                    </p>
+                </div> 
+
+                <div class="col-sm-1">
+                    <p class="lead">
+                        <i class="fa fa-clock-o"></i>
+                    </p>
+                </div>
+                <div class="col-sm-11">
+                    <p class="lead">
+                    {{ consult.start.strftime("%I:%M %p") }} to 
+                    {{ consult.end.strftime("%I:%M %p") }}
+                    </p>
+                </div>
+
+                <div class="col-sm-1">
+                    <p class="lead">
+                        <i class="fa fa-map-marker"></i>
+                    </p>
+                </div>
+                <div class="col-sm-11">
+                    <p class="lead">
+                    {{ consult.venue }}
+                    </p>
+                </div>
+
+                <div class="col-sm-1">
+                    <p class="lead">
+                        <i class="fa fa-user"></i>
+                    </p>
+                </div>
+                <div class="col-sm-11">
+                    <p class="lead">
+                    {{ consult.attendees.all()|length }} of 
+                    {{ consult.num_of_students }} students
+                    </p>
+                </div>
+
+                {% if consult.contact_details %}
+                <div class="col-sm-1">
+                    <p class="lead">
+                        <i class="fa fa-phone"></i>
+                    </p>
+                </div>
+                <div class="col-sm-11">
+                    <p class="lead">
+                    {{ consult.contact_details }}
+                    </p>
+                </div>
+                {% endif %}
+
+                <div class="col-sm-1">
+                    <p class="lead">
+                        <i class="fa fa-file-text-o"></i>
+                    </p>
+                </div>
+                <div class="col-sm-11">
+                    <p class="lead">
+                    {{ consult.description }}
+                    </p>
+                </div>
+            </div>
+            
+            <!-- Admin Panel -->
+            <div class="col-sm-6">
+                <a href="{{ url_for('main.update_class') }}?consult_id={{consult.consult_id}}" class="btn btn-block btn-warning" aria-label="Update">
+                  <strong>Update</strong>
+                </a>
+            </div>
+            <div class="col-sm-6">
+                <a href=" {{ url_for('main.delete_class', consult_id=consult.consult_id) }}" class="btn btn-block btn-danger" aria-label="Delete">
+                  <strong>Delete</strong>
+                </a>
+            </div>
+        </div>
+        <div class="col-sm-3"></div>
+    </div>
+
+    <!-- Info -->
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+$(document).ready(function(){
+    $('[data-toggle="popover"]').popover(); 
+});
+</script>
+{% endblock %}

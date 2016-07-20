@@ -52,7 +52,8 @@ def index():
                             curr_mod = Module(module_code=module_code, name=module_name)
                             db.session.add(curr_mod)
 
-                        db_user.takes(curr_mod, year=module_year, sem=module_sem)
+                        if curr_mod not in db_user.modules_taken.all():
+                            db_user.takes(curr_mod, year=module_year, sem=module_sem)
 
             ##### START PROCESS IN THREAD #####
             app = current_app._get_current_object()
@@ -115,6 +116,10 @@ def home():
     give_help = sorted(current_user.teaching.filter(Consultation.consult_date >= datetime.date(datetime.now())).all(), key=lambda x: x.consult_date)
     return render_template('see_schedule.html', get_help=get_help, give_help=give_help, User=User)
 
+###########
+# Consult #
+###########
+
 @main.route('/join_class/<consult_id>')
 @login_required
 def join_class(consult_id):
@@ -153,7 +158,8 @@ def update_class():
                           end = consult.end.strftime("%I:%M %p"),
                           venue = consult.venue,
                           max_students = consult.num_of_students,
-                          contact_details = consult.contact_details)
+                          contact_details = consult.contact_details,
+                          description = consult.description)
 
     mods = current_user.modules_taken.all()
     mod_choices = [(mod.module_code, str(mod)[8:-1]) for mod in mods]
@@ -168,6 +174,7 @@ def update_class():
         consult.num_of_students=form.max_students.data
         consult.contact_details=form.contact_details.data
         consult.teacher_id=current_user.user_id
+        consult.description=form.description.data
 
         db.session.add(consult)
 
@@ -189,6 +196,28 @@ def delete_class(consult_id):
     db.session.delete(consult)
     flash("You have deleted a consultation slot.")
     return redirect(url_for('.home'))
+
+@main.route('/class_admin/<consult_id>')
+@login_required
+def class_admin(consult_id):
+    consult = Consultation.query.get(consult_id)
+
+    if consult not in current_user.teaching:
+        flash("You are not teaching this class.")
+        return redirect(url_for('.home'))
+
+    return render_template('class_admin.html', consult=consult)
+
+@main.route('/class_details/<consult_id>')
+@login_required
+def class_details(consult_id):
+    consult = Consultation.query.get(consult_id)
+    
+    if consult not in current_user.attending:
+        flash("You are not attending this class.")
+        return redirect(url_for('.home'))
+
+    return render_template('class_details.html', consult=consult)
 
 @main.route("/logout")
 @login_required

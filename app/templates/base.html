@@ -33,6 +33,7 @@
 <!-- Custom Fonts -->
 <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css">
 <link href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic" rel="stylesheet" type="text/css">
+<link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css">
 {% endblock %}
 
 {% block navbar %}
@@ -45,16 +46,16 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="/">Help</a>
+            <a class="navbar-brand" href="{{ url_for('main.index') }}">Help</a>
         </div>
         <div class="navbar-collapse collapse">
             <ul class="nav navbar-nav navbar-right">
                 <li><a href="/">Home</a></li>
                 
                 {% if current_user.is_authenticated %}
-                <li><a href="get_help">Get Help</a></li>
-                <li><a href="provide_help">Provide Help</a></li>
-                <li><a href="logout">Log Out</a></li>
+                <li><a href="{{ url_for('main.get_help') }}">Get Help</a></li>
+                <li><a href="{{ url_for('main.provide_help') }}">Provide Help</a></li>
+                <li><a href="{{ url_for('main.logout') }}">Log Out</a></li>
                 {% else %}
                 <li><a href="https://ivle.nus.edu.sg/api/login/?apikey=UY5RaT4yK3lgWflM47CJo&url={{ url_for('main.index', _external=True)|e }}">Log In</a></li>
                 {% endif %}
