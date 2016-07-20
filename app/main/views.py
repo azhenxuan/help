@@ -102,7 +102,8 @@ def provide_help():
                                venue=form.venue.data,
                                num_of_students=form.max_students.data,
                                contact_details=form.contact_details.data,
-                               teacher_id=current_user.user_id)
+                               teacher_id=current_user.user_id,
+                               description=form.description.data)
         flash("New consultation slot added for {module_code}".format(module_code=form.module_code.data))
         db.session.add(consult)
         return redirect(url_for('.home'))
