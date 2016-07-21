@@ -33,7 +33,6 @@
 <!-- Custom Fonts -->
 <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css">
 <link href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic" rel="stylesheet" type="text/css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css">
 {% endblock %}
 
 {% block navbar %}
@@ -78,3 +77,7 @@
 </div>
 {% endblock %}
 
+{% block scripts %}
+{{ super() }}
+<script src="https://use.fontawesome.com/ad691dc47b.js"></script>
+{% endblock %}
