@@ -31,6 +31,7 @@ class Consultation(db.Model):
     contact_details = db.Column(db.String(40), nullable=True) 
     description = db.Column(db.String(140))
     teacher_id = db.Column(db.String(20), db.ForeignKey('users.user_id'))
+    comments = db.relationship('Comment', backref='consult')
     attendees = db.relationship('User',
                                 secondary=registrations,
                                 backref=db.backref('attending', lazy='dynamic'),
@@ -52,6 +53,7 @@ class User(UserMixin, db.Model):
                               backref=db.backref('user', lazy='joined'),
                               lazy='dynamic',
                               cascade='all, delete-orphan')
+    comments = db.relationship('Comment', backref='author')
     
     def __repr__(self):
         return '<User {id}: {name}>'.format(id=self.user_id, name=self.name)
@@ -117,6 +119,16 @@ class Module(db.Model):
 
     def __repr__(self):
         return '<Module {module_code}: {name}>'.format(module_code=self.module_code, name=self.name) 
+
+class Comment(db.Model):
+    __tablename__ = 'comments'
+    comment_id = db.Column(db.Integer, primary_key=True)
+    message = db.Column(db.String(140))
+    user_id = db.Column(db.String(20), db.ForeignKey('users.user_id'))
+    consult_id = db.Column(db.Integer, db.ForeignKey('consultations.consult_id'))
+
+    def __repr__(self):
+        return '<Comment {}: {}>'.format(comment_id, message) 
 
 @login_manager.user_loader
 def load_user(user_id):

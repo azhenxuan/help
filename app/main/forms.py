@@ -15,7 +15,7 @@ class NewConsultForm(Form):
     contact_details = StringField('HP Number (Optional)', validators=[Length(max=8, 
         message="Please input a valid phone number")])
     description = TextAreaField("What're you teaching?", validators=[Length(max=140,
-        message="Please keep it to less than 140 chars"), Required()])
+        message="Please keep it to less than 140 chars")])
     submit       = SubmitField()
 
     # Check that start time is before end time
@@ -32,3 +32,8 @@ class NewConsultForm(Form):
             self.end.errors.append("Make sure your consult doesn't end before it starts")
             return False
         return result
+
+class NewCommentForm(Form):
+    message = TextAreaField('Comment', validators=[Length(max=140, 
+        message="Please keep it to less than 140 chars"), Required()])
+    submit  = SubmitField()

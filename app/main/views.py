@@ -2,8 +2,8 @@ from flask import Flask, render_template, flash, request, session, redirect, url
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 from datetime import datetime
 from threading import Thread
-from ..models import UserModule, Consultation, User, Module
-from .forms import NewConsultForm
+from ..models import UserModule, Consultation, User, Module, Comment
+from .forms import NewConsultForm, NewCommentForm
 from . import main
 from .. import db
 from .api import *
@@ -198,27 +198,47 @@ def delete_class(consult_id):
     flash("You have deleted a consultation slot.")
     return redirect(url_for('.home'))
 
-@main.route('/class_admin/<consult_id>')
-@login_required
-def class_admin(consult_id):
-    consult = Consultation.query.get(consult_id)
-
-    if consult not in current_user.teaching:
-        flash("You are not teaching this class.")
-        return redirect(url_for('.home'))
-
-    return render_template('class_admin.html', consult=consult)
-
-@main.route('/class_details/<consult_id>')
+@main.route('/class_details/<consult_id>', methods=['GET', 'POST'])
 @login_required
 def class_details(consult_id):
+    form = NewCommentForm()
     consult = Consultation.query.get(consult_id)
+    comments = Comment.query.filter_by(consult_id=consult_id).all()
     
-    if consult not in current_user.attending:
-        flash("You are not attending this class.")
+    if (consult not in current_user.attending) and consult.teacher != current_user:
+        flash("You are not in this class.")
         return redirect(url_for('.home'))
 
-    return render_template('class_details.html', consult=consult)
+    if form.validate_on_submit():
+        comment = Comment(message=form.message.data,
+                          user_id=current_user.user_id,
+                          consult_id=consult_id)
+        flash("New comment added")
+        db.session.add(comment)
+        return redirect(url_for('.class_details', 
+                        consult_id=consult_id))
+
+    return render_template('class_details.html', 
+                           consult=consult, 
+                           form=form,
+                           comments=comments)
+
+
+@main.route('/delete_comment/<comment_id>')
+@login_required
+def delete_comment(comment_id):
+    comment = Comment.query.get(comment_id)
+    consult_id = comment.consult.consult_id
+    
+    if comment.author != current_user:
+        flash("This isn't your comment.")
+        return redirect(url_for('.class_details', 
+                        consult_id=consult_id))
+
+    db.session.delete(comment)
+    flash("You have deleted a comment.")
+    return redirect(url_for('.class_details', 
+                    consult_id=consult_id))
 
 @main.route("/logout")
 @login_required

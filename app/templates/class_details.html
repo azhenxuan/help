@@ -8,7 +8,11 @@
     <div class="row">
         <div class="col-sm-3"></div>
         <div class="col-sm-6 well">
+            {% if consult.teacher == current_user %}
+            <h1>Thanks for teaching {{ consult.module_code }}!</h1>
+            {% else %}
             <h1>Thanks for signing up!</h1>
+            {% endif %}
             <hr>
             <div class="col-sm-12">
                 {% if consult.attendees.all()|length %}
@@ -116,11 +120,49 @@
                 </div>
             </div>
             
+            {% if consult.teacher == current_user %}
+            <div class="col-sm-6">
+                <a href="{{ url_for('main.update_class') }}?consult_id={{consult.consult_id}}" class="btn btn-block btn-warning" aria-label="Update">
+                  <strong>Update</strong>
+                </a>
+            </div>
+            <div class="col-sm-6">
+                <a href=" {{ url_for('main.delete_class', consult_id=consult.consult_id) }}" class="btn btn-block btn-danger" aria-label="Delete">
+                  <strong>Delete</strong>
+                </a>
+            </div>
+            {% else %}
             <div class="col-sm-12">
                 <a href="{{ url_for('main.quit_class', consult_id=consult.consult_id) }}" class="btn btn-block btn-warning" aria-label="Quit">
                   <strong>Quit</strong>
                 </a>
             </div>
+            {% endif %}
+            <div class="col-sm-12"><hr></div>
+            
+            <!-- Comments Section -->
+            <div class="col-sm-12"><h2>Comments</h2></div>
+            {% for comment in comments %}
+            <div class="col-sm-1">
+                <a href="{{url_for('main.delete_comment', comment_id=comment.comment_id)}}"
+                class="btn btn-danger {% if comment.author != current_user %}disabled{% endif %}">
+                    <i class="fa fa-times"></i>
+                </a>
+            </div>   
+            <div class="col-sm-11">
+                <p>
+                    {% if comment.author == consult.teacher %}
+                    <i class="fa fa-star"></i>
+                    {% else %}
+                    <i class="fa fa-star-o"></i>
+                    {% endif %}
+                    <strong>{{ comment.author.name.title() }}:</strong><br>
+                    {{ comment.message }}
+                </p>
+            </div>
+            {% endfor %}
+            <div class="col-sm-12">{{ wtf.quick_form(form, form_type="horizontal") }}</div>
+            
         </div>
         <div class="col-sm-3"></div>
     </div>
