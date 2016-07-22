@@ -11,10 +11,8 @@ import requests
 import json
 import os
 
-@main.route('/')
-def index():
-    if request.args.get('token'):
-        session['token'] = request.args['token']
+def login(token):
+    session['token'] = token
 
     if session.get('token'):
         user = UserAPI(session['token'])
@@ -27,8 +25,8 @@ def index():
             if not db_user:
                 db_user = User(name=name, user_id=user_id)
             
-            db.session.add(db_user)
-            db.session.commit()
+                db.session.add(db_user)
+                db.session.commit()
 
             def update_modules(app, user_api):
                 with app.app_context():
@@ -63,9 +61,21 @@ def index():
 
             login_user(db_user)
 
-            return redirect(url_for('.home'))
+            return True
         session['token'] = None
-    return render_template('index.html', name=None)
+
+@main.route('/')
+def index():
+    token = request.args.get('token')
+    if token and login(token):
+        # Redirect to last visited page
+        if session.get("next"):
+            url =  session["next"]
+            del session["next"]
+            return redirect(url)
+        return redirect(url_for('.home'))
+
+    return render_template('index.html')
 
 @main.route('/get_help')
 @login_required
@@ -125,14 +135,16 @@ def home():
 @login_required
 def join_class(consult_id):
     consult = Consultation.query.get(consult_id)
-    if consult not in current_user.attending and consult.not_full():
+    if not consult.not_full():
+        flash("You're too late! There are no more slots left for this consult.")
+    elif consult in current_user.teaching:
+        flash("Dude. You're the teacher.")
+    elif consult in current_user.attending:
+        flash("You've already enrolled in this class.")
+    else:
         current_user.attending.append(consult)
         db.session.add(current_user)
         flash("You have successfully enrolled in this class.")
-    elif not consult.not_full():
-        flash("You're too late! There are no more slots left for this consult.")
-    else:
-        flash("You've already enrolled in this class.")
     return redirect(url_for('.get_help'))
 
 @main.route('/quit_class/<consult_id>')

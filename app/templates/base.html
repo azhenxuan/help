@@ -45,11 +45,20 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="{{ url_for('main.index') }}">Help</a>
+            <a class="navbar-brand" href="{% if current_user.is_authenticated %}
+            {{ url_for('main.home') }}
+            {% else %}
+            {{ url_for('main.index') }}
+            {% endif %}
+            ">Help</a>
         </div>
         <div class="navbar-collapse collapse">
             <ul class="nav navbar-nav navbar-right">
-                <li><a href="/">Home</a></li>
+                <li><a href="{% if current_user.is_authenticated %}
+                {{ url_for('main.home') }}
+                {% else %}
+                {{ url_for('main.index') }}
+                {% endif %}">Home</a></li>
                 
                 {% if current_user.is_authenticated %}
                 <li><a href="{{ url_for('main.get_help') }}">Get Help</a></li>

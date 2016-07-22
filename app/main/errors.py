@@ -1,10 +1,11 @@
-from flask import render_template, redirect, url_for, flash
+from flask import render_template, redirect, url_for, flash, request, session
 from . import main
 
 # Error Handling
 @main.app_errorhandler(401)
 def logged_out(e):
     flash("You are currently logged out. Please log in.")
+    session["next"] = request.path
     return redirect(url_for('.index'))
 
 @main.app_errorhandler(404)

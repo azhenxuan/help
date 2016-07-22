@@ -55,12 +55,12 @@ body {
 }
 /* Navbar End */
 
-.get-help .well .consult {
-	background-color: #617FD0;
+.get-help .consult {
+	background-color: #6699FF;
 	font-weight: bold;
 }
 
-.give-help .well .consult {
+.give-help .consult {
 	background-color: #EFD653;
 	font-weight: bold;
 }
