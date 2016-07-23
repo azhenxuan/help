@@ -1,5 +1,75 @@
 # Project HELP
 
+## Status Update for Milestone 3
+
+In the past month, we've been able to test the application on many of our 
+friends, and made significant updates based on their feedback. The application
+is available to view [here](http://nus-help.herokuapp.com), and our milestone 3 
+video is [here](https://www.youtube.com/watch?v=26umT37VlAg).
+
+### User Feedback 
+
+User testing was really helpful not only in identifying bugs in our app, but
+also helped us focus on features that were important to the users. However, 
+due to time constraints, not all of their suggestions could be incorporated
+into the app.
+
+One major bugfix was only discovered when we realised that some students were
+unable to view their modules through our app. Through our error logs, we 
+realised that the CFG module caused the thread to throw an error due to its 
+excessively long name. We confirmed that only students who had taken the CFG
+module had this issue, and were finally able to fix the issue, and confirm the
+fix with the help of our testers.
+
+We also received a lot of suggestions, which can categorized into:
+
+1. Aesthetics - Some users felt that the app could be redesigned and made more
+unique (it had a distinctly Bootstrap feel to it)
+
+2. Functionality 
+	- Manually add modules
+	- Calendar views similar to Google Cal
+	- Reporting system for errant users
+	- Better location selection
+	- Mobile app to complement the website
+
+In general, the consensus was that the testers were willing to use the app, but
+only predicated on support from the teaching staff.
+
+### New features
+
+1. **Consult Details page**: Every consult now has it's own page, where its 
+creators can manage the consult, see who's signed up etc, and students can 
+see all the details about the consult.
+
+2. **Comments section**: Students who have questions about the consult can
+now post questions after joining the consult!
+
+3. **Invite link**: We generate an invite link for each consult so users can
+invite their friends to join them for their consults. TAs can also use this 
+feature to get their students to attend their consults.
+
+4. **Module Filtering**: On the Get-Help page, students can filter through 
+their modules based on module code.
+
+### Unit Testing
+
+While we don't have complete coverage or end-to-end tests, we were able to
+make some headway by writing automated tests for some sections of our code.
+We hope to improve on this by writing more tests after this milestone. 
+
+### Shortcomings
+
+Due to the limitations of the IVLE API, only students have access to the full
+functionality of the app. This greatly limits its potential, since students 
+would be most interested in getting help from professors. 
+
+One solution would be to provide a separate interface for professors, which 
+allows them to manually add the modules that they teach. The target date for 
+completion of this separate interface would be by Splashdown.
+
+-- END OF MILESTONE 3 UPDATE --
+
 ## Status Update for Milestone 2
 
 The progress of Project Help has been in-line with expectations. A demo of the
