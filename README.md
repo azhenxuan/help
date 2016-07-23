@@ -26,7 +26,7 @@ We also received a lot of suggestions, which can categorized into:
 1. Aesthetics - Some users felt that the app could be redesigned and made more
 unique (it had a distinctly Bootstrap feel to it)
 
-2. Functionality 
+2. Functionality (for future sprints)
 	- Manually add modules
 	- Calendar views similar to Google Cal
 	- Reporting system for errant users
@@ -134,11 +134,18 @@ him/herself
 4. (Student) Automatically display mods taken this sem 
 5. (Student) Automatically filters irrelevant GetHelp sessions which provides
 a cleaner view for users
+6. (Users) Consult details page to manage/view details
+7. (Users) Add comments/queries to consults
+8. (Users) Invite people to join consults using invite link
 
 ### Next Sprint (Subject to change based on user feedback)
-1. (Users)   Blacklist students that don't turn up
-2. (Users)   Consult modal that shows details about the consult
-3. (Student) Add feedback for help sessions
+1. (Users) Manually add modules
+2. (Users) Reporting system for errant users
+3. (Teacher) Better location selection
+
+### KIV
+1. (Users) Mobile app to complement the website
+2. (Users) Calendar views similar to Google Cal
 
 ## User Stories
 1. As a **Student**, I want to *register for help sessions*, so I can 
