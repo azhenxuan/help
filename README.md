@@ -7,7 +7,7 @@ friends, and made significant updates based on their feedback. The application
 is available to view [here](http://nus-help.herokuapp.com), and our milestone 3 
 video is [here](https://www.youtube.com/watch?v=26umT37VlAg).
 
-### User Feedback (Form we sent out [here](docs/"Usability Testing.pdf"))
+### User Feedback (Form we sent out [here](docs/Usability Testing.pdf))
 
 User testing was really helpful not only in identifying bugs in our app, but
 also helped us focus on features that were important to the users. However, 
