@@ -104,7 +104,7 @@ class User(UserMixin, db.Model):
 class Module(db.Model):
     __tablename__ = 'modules'
     module_code = db.Column(db.String(40), primary_key=True)
-    name = db.Column(db.String(200))
+    name = db.Column(db.String(255))
     consults = db.relationship('Consultation', backref='module', lazy='dynamic')
     modules = db.relationship('UserModule',
                               foreign_keys=[UserModule.module_id],
