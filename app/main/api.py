@@ -132,6 +132,7 @@ class UserAPI:
 
         get_modules_url = generate_api_call("Modules_Taken", params)
         r = requests.get(get_modules_url)
+    
         return r.json()['Results']
 
     def get_modules_taken_code_names(self):
@@ -140,6 +141,19 @@ class UserAPI:
         """
         modules_taken = self.get_modules_taken()
         return [mod['ModuleCode'] for mod in modules_taken]
+
+    def get_prof_modules(self):
+        """
+        Returns a list of prof modules.
+        """
+        if not self.api_key:
+            raise MissingTokenException("User was not instantiated with a token.")
+
+        params = {'APIKey': self.api_key, 'AuthToken': self.auth_token, 'Duration': 0}
+
+        get_prof_modules_url = generate_api_call("Modules", params)
+        r = requests.get(get_prof_modules_url)
+        return r.json()['Results']
 
     if __name__ == '__main__':
         pass

@@ -35,6 +35,26 @@ def login(token):
                     db_user = User.query.get(user_id)
                     modules_taken = user_api.get_modules_taken()
 
+                    # Profs don't have any modules
+                    if not modules_taken:
+                        prof_modules = user_api.get_prof_modules()
+
+                        for module in prof_modules:
+                            module_name = module['CourseName']
+                            module_code = module['CourseCode']
+                            module_year = int(module['CourseAcadYear'].split('/')[1])
+                            module_sem = int(module['CourseSemester'][-1])
+
+                            curr_mod = Module.query.filter_by(module_code=module_code).first()
+
+                            if not curr_mod:
+                                curr_mod = Module(module_code=module_code, name=module_name)
+                                db.session.add(curr_mod)
+
+                            if curr_mod not in db_user.modules_taken.all():
+                                db_user.takes(curr_mod, year=module_year, sem=module_sem)
+                        return
+
                     if len(modules_taken) == len(db_user.modules_taken.all()):
                         return
                     
