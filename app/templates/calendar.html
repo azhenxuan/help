@@ -50,7 +50,7 @@ $(document).ready(function() {
             color: '#EFD653',
             url: "{{ url_for('main.class_details', consult_id=consult.consult_id) }}"
         }
-        {%- if loop.last %},{% endif %}
+        {%- if not loop.last %},{% endif %}
         {% endfor %}
         ]
     })
