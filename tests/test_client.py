@@ -26,7 +26,7 @@ class FlaskClientTestCase(unittest.TestCase):
     def test_home_page(self):
         response = self.client.get(url_for('main.index'))
         self.assertEqual(response.status_code, 200)
-        self.assertTrue(b'Platform to facilitate consultations between users.' in response.data)
+        self.assertTrue(b'Platform to facilitate consultations between users' in response.data)
 
     # def test_login(self):
     #     response = self.client.get(url_for('main.index'), query_string=dict(token=self.test_token), follow_redirects=True)

@@ -64,6 +64,19 @@ While we don't have complete coverage or end-to-end tests, we were able to
 make some headway by writing automated tests for some sections of our code.
 We hope to improve on this by writing more tests after this milestone. 
 
+Coverage Summary:
+Name                              Stmts   Miss Branch BrPart  Cover
+-------------------------------------------------------------------
+app\__init__.py                      25      2      2      1    89%
+app\main\__init__.py                  3      0      0      0   100%
+app\main\api.py                      77     27     28      8    55%
+app\main\errors.py                   10      1      0      0    90%
+app\main\forms.py                    28      9      4      0    59%
+app\main\views.py                   197     98     72     13    45%
+app\models.py                        84     18      6      0    73%
+-------------------------------------------------------------------
+TOTAL                               424    155    112     22    56%
+
 -- END OF MILESTONE 3 UPDATE --
 
 ## Status Update for Milestone 2
