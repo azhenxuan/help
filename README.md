@@ -64,6 +64,7 @@ While we don't have complete coverage or end-to-end tests, we were able to
 make some headway by writing automated tests for some sections of our code.
 We hope to improve on this by writing more tests after this milestone. 
 
+```
 Coverage Summary:
 Name                              Stmts   Miss Branch BrPart  Cover
 -------------------------------------------------------------------
@@ -76,6 +77,7 @@ app\main\views.py                   197     98     72     13    45%
 app\models.py                        84     18      6      0    73%
 -------------------------------------------------------------------
 TOTAL                               424    155    112     22    56%
+```
 
 -- END OF MILESTONE 3 UPDATE --
 
