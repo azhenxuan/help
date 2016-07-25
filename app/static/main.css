@@ -84,3 +84,9 @@ body {
 
   margin: auto;
 }
+
+/*Calendar*/
+
+#calendar .fc-event .fc-bg {
+    background: none;
+}

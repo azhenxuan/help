@@ -10,9 +10,9 @@ video is [here](https://www.youtube.com/watch?v=26umT37VlAg).
 ### User Feedback (Form we sent out [here](docs/Usability Testing.pdf))
 
 User testing was really helpful not only in identifying bugs in our app, but
-also helped us focus on features that were important to the users. However, 
-due to time constraints, not all of their suggestions could be incorporated
-into the app.
+also helped us focus on features that were important to the users. We are 
+also extremely grateful to Professor Kan Min-Yen for his help with testing our
+application. 
 
 One major bugfix was only discovered when we realised that some students were
 unable to view their modules through our app. Through our error logs, we 
@@ -28,13 +28,14 @@ unique (it had a distinctly Bootstrap feel to it)
 
 2. Functionality (for future sprints)
 	- Manually add modules
-	- Calendar views similar to Google Cal
+	- Calendar editing similar to Google Cal 
 	- Reporting system for errant users
 	- Better location selection
 	- Mobile app to complement the website
 
 In general, the consensus was that the testers were willing to use the app, but
-only predicated on support from the teaching staff. 
+only predicated on support from the teaching staff. Due to time constraints, 
+however, not all the above features could be incorporated into the application.
 
 ### New features
 
@@ -52,21 +53,16 @@ feature to get their students to attend their consults.
 4. **Module Filtering**: On the Get-Help page, students can filter through 
 their modules based on module code.
 
+5. **Calendar View**: As suggested by our testers, we started work on a 
+calendar view. Users can now view their timetable in calendar format. We also
+plan to allow them to edit their consults through the calendar interface in the
+future.
+
 ### Unit Testing
 
 While we don't have complete coverage or end-to-end tests, we were able to
 make some headway by writing automated tests for some sections of our code.
 We hope to improve on this by writing more tests after this milestone. 
-
-### Shortcomings
-
-Due to the limitations of the IVLE API, only students have access to the full
-functionality of the app. This greatly limits its potential, since students 
-would be most interested in getting help from professors. 
-
-One solution would be to provide a separate interface for professors, which 
-allows them to manually add the modules that they teach. The target date for 
-completion of this separate interface would be by Splashdown.
 
 -- END OF MILESTONE 3 UPDATE --
 

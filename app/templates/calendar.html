@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block subtitle %}Calendar View{% endblock %}
+
+{% block page_content %}
+<div class="container">
+    <h1>Calendar View</h1>
+    <hr>
+    <!--Start Schedule Box-->
+    <div class="row">
+        <div class="col-sm-10 col-sm-offset-1 well">
+            <div id="calendar"></div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+$(document).ready(function() {
+
+    // Initialize calendar
+    $('#calendar').fullCalendar({
+        defaultView: 'agendaWeek',
+        allDaySlot: false,
+        height: 350,
+        events: [
+        {% for consult in get_help %}
+        {   
+            title: '{{ consult.module_code}}',
+            start: '{{ consult.consult_date }} {{ consult.start.strftime("%I:%M %p") }}',
+            end: '{{ consult.consult_date }} {{ consult.end.strftime("%I:%M %p") }}',
+            color: '#6699FF',
+            url: "{{ url_for('main.class_details', consult_id=consult.consult_id) }}"
+        }
+        {%- if not loop.last %},{% endif %}
+        {% endfor %}
+
+        {% if give_help %}
+        ,
+        {% endif %}
+
+        {% for consult in give_help %}
+        {   
+            title: '{{ consult.module_code}}',
+            start: '{{ consult.consult_date }} {{ consult.start.strftime("%I:%M %p") }}',
+            end: '{{ consult.consult_date }} {{ consult.end.strftime("%I:%M %p") }}',
+            color: '#EFD653',
+            url: "{{ url_for('main.class_details', consult_id=consult.consult_id) }}"
+        }
+        {%- if loop.last %},{% endif %}
+        {% endfor %}
+        ]
+    })
+
+});
+</script>
+{% endblock %}

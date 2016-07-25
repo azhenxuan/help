@@ -33,6 +33,7 @@
 <!-- Custom Fonts -->
 <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css">
 <link href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic" rel="stylesheet" type="text/css">
+<link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/2.9.0/fullcalendar.min.css'>
 {% endblock %}
 
 {% block navbar %}
@@ -61,6 +62,7 @@
                 {% endif %}">Home</a></li>
                 
                 {% if current_user.is_authenticated %}
+                <li><a href="{{ url_for('main.calendar') }}">My Calendar</a></li>
                 <li><a href="{{ url_for('main.get_help') }}">Get Help</a></li>
                 <li><a href="{{ url_for('main.provide_help') }}">Provide Help</a></li>
                 <li><a href="{{ url_for('main.logout') }}">Log Out</a></li>
@@ -88,5 +90,7 @@
 
 {% block scripts %}
 {{ super() }}
+{{ moment.include_moment() }}
+<script src="//cdnjs.cloudflare.com/ajax/libs/fullcalendar/2.9.0/fullcalendar.min.js"></script>
 <script src="https://use.fontawesome.com/ad691dc47b.js"></script>
 {% endblock %}

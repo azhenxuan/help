@@ -7,7 +7,7 @@
 <div class="container">
     <h1>Hi, {{ current_user.name.title() }}</h1>
     <hr>
-    <!--Form-->
+    <!--Start Schedule Box-->
     <div class="row">
         <div class="get-help col-sm-6 col-xs-12">
             <div class="well">
@@ -39,7 +39,7 @@
                     <br>
                     <div class="row">
                         <div class="col-md-12">
-                            <a href="{{ url_for('main.class_details', consult_id=consult.consult_id) }}" class="btn btn-block btn-default" aria-label="Quit">
+                            <a href="{{ url_for('main.class_details', consult_id=consult.consult_id) }}" class="btn btn-block btn-default" aria-label="Details">
                               <strong>Details</strong>
                             </a>
                         </div>
@@ -87,5 +87,7 @@
             </div>
         </div>
     </div>
+    <!-- End Schedule Box -->
 </div>
 {% endblock %}
+

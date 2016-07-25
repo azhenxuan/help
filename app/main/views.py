@@ -147,6 +147,13 @@ def home():
     give_help = sorted(current_user.teaching.filter(Consultation.consult_date >= datetime.date(datetime.now())).all(), key=lambda x: x.consult_date)
     return render_template('see_schedule.html', get_help=get_help, give_help=give_help, User=User)
 
+@main.route('/calendar')
+@login_required
+def calendar():
+    get_help = sorted(current_user.attending.filter(Consultation.consult_date >= datetime.date(datetime.now())).all(), key=lambda x: x.consult_date)
+    give_help = sorted(current_user.teaching.filter(Consultation.consult_date >= datetime.date(datetime.now())).all(), key=lambda x: x.consult_date)
+    return render_template('calendar.html', get_help=get_help, give_help=give_help, User=User)
+
 ###########
 # Consult #
 ###########
