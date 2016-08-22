@@ -39,7 +39,7 @@ $(document).ready(function() {
         {%- if not loop.last %},{% endif %}
         {% endfor %}
 
-        {% if give_help %}
+        {% if give_help and get_help %}
         ,
         {% endif %}
 
