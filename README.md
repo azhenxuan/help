@@ -5,7 +5,12 @@
 In the past month, we've been able to test the application on many of our 
 friends, and made significant updates based on their feedback. The application
 is available to view [here](http://nus-help.herokuapp.com), and our milestone 3 
-video is [here](https://www.youtube.com/watch?v=26umT37VlAg).
+video is [here](https://www.youtube.com/watch?v=26umT37VlAg). Older features 
+demonstrated in the milestone 2 video were not demonstrated again. To view those,
+go [here](https://youtu.be/3HfA9drTI4k). (Note that some new features did not 
+appear in any of the videos as they were pushed to production only after the 
+video was completed, and there wasn't sufficient time to include them. This
+includes the 'Invite Link' and 'Calendar View' features.)
 
 ### User Feedback (Form we sent out [here](docs/Usability Testing.pdf))
 
@@ -44,11 +49,12 @@ creators can manage the consult, see who's signed up etc, and students can
 see all the details about the consult.
 
 2. **Comments section**: Students who have questions about the consult can
-now post questions after joining the consult!
+now post questions after joining the consult! (On the consults details page)
 
 3. **Invite link**: We generate an invite link for each consult so users can
 invite their friends to join them for their consults. TAs can also use this 
-feature to get their students to attend their consults.
+feature to get their students to attend their consults. (Below the comments
+section)
 
 4. **Module Filtering**: On the Get-Help page, students can filter through 
 their modules based on module code.
@@ -56,7 +62,7 @@ their modules based on module code.
 5. **Calendar View**: As suggested by our testers, we started work on a 
 calendar view. Users can now view their timetable in calendar format. We also
 plan to allow them to edit their consults through the calendar interface in the
-future.
+future. (My Calendar link in the navbar)
 
 ### Unit Testing
 
